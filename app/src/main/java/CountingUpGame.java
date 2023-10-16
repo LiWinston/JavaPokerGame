@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
-public class CountingUpGame extends CardGame implements GGKeyListener {
+public class CountingUpGame extends CardGame  {
 
 
 
@@ -26,9 +26,19 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
     public boolean rankGreater(Card card1, Card card2) {
         return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
     }
+// new in -----------------------------------------------------------------------------------------------------------------------
+    public CardDealer dealer = new CardDealer(properties);
+    public Logger logger = new Logger();
 
+<<<<<<< Updated upstream
     public CardDealer dealer = new CardDealer(properties);
 
+=======
+    public Score score = new  Score(this);
+
+    public PlayerController controller = new PlayerController(this,properties);
+//new in-----------------------------------------------------------------------------------------------------------------------
+>>>>>>> Stashed changes
     private final String version = "1.0";
     public final int nbPlayers = 4;
     public final int nbStartCards = 13;
@@ -69,67 +79,13 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
     private boolean isAuto = false;
 
     Font bigFont = new Font("Arial", Font.BOLD, 36);
-
-    private void initScore() {
-        for (int i = 0; i < nbPlayers; i++) {
-            // scores[i] = 0;
-            String text = "[" + String.valueOf(scores[i]) + "]";
-            scoreActors[i] = new TextActor(text, Color.WHITE, bgColor, bigFont);
-            addActor(scoreActors[i], scoreLocations[i]);
-        }
-    }
-
-    private void calculateScoreEndOfRound(int player, List<Card> cardsPlayed) {
-        int totalScorePlayed = 0;
-        for (Card card: cardsPlayed) {
-            Rank rank = (Rank) card.getRank();
-            totalScorePlayed += rank.getScoreCardValue();
-        }
-        scores[player] += totalScorePlayed;
-    }
-
-    private void calculateNegativeScoreEndOfGame(int player, List<Card> cardsInHand) {
-        int totalScorePlayed = 0;
-        for (Card card: cardsInHand) {
-            Rank rank = (Rank) card.getRank();
-            totalScorePlayed -= rank.getScoreCardValue();
-        }
-        scores[player] += totalScorePlayed;
-    }
-
-    private void updateScore(int player) {
-        removeActor(scoreActors[player]);
-        int displayScore = scores[player] >= 0 ? scores[player] : 0;
-        String text = "P" + player + "[" + String.valueOf(displayScore) + "]";
-        scoreActors[player] = new TextActor(text, Color.WHITE, bgColor, bigFont);
-        addActor(scoreActors[player], scoreLocations[player]);
-    }
-
-    private void initScores() {
-        for (int i = 0; i < nbPlayers; i++) {
-            scores[i] = 0;
-        }
-    }
-
-    private void updateScores() {
-        for (int i = 0; i < nbPlayers; i++) {
-        }
-    }
-
     private Card selected;
 
-    @Override
-    public boolean keyPressed(KeyEvent keyEvent) {
-        if (isWaitingForPass && keyEvent.getKeyChar() == '\n') {
-            passSelected = true;
-        }
-        return false;
-    }
 
-    @Override
-    public boolean keyReleased(KeyEvent keyEvent) {
-        return false;
-    }
+
+
+
+
 
     private void initGame() {
         hands = new Hand[nbPlayers];
@@ -162,6 +118,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
     }
 
 
+<<<<<<< Updated upstream
     // return random Enum value
 //    public static <T extends Enum<?>> T randomEnum(Class<T> clazz) {
 //        int x = random.nextInt(clazz.getEnumConstants().length);
@@ -255,6 +212,8 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
 //        }
 //    }
 
+=======
+>>>>>>> Stashed changes
     private int playerIndexWithAceClub() {
         for (int i = 0; i < nbPlayers; i++) {
             Hand hand = hands[i];
@@ -272,48 +231,17 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         return 0;
     }
 
-    private void addCardPlayedToLog(int player, Card selectedCard) {
-        if (selectedCard == null) {
-            logResult.append("P" + player + "-SKIP,");
-        } else {
-            Rank cardRank = (Rank) selectedCard.getRank();
-            Suit cardSuit = (Suit) selectedCard.getSuit();
-            logResult.append("P" + player + "-" + cardRank.getRankCardLog() + cardSuit.getSuitShortHand() + ",");
-        }
-    }
-
-    private void addRoundInfoToLog(int roundNumber) {
-        logResult.append("Round" + roundNumber + ":");
-    }
-
-    private void addEndOfRoundToLog() {
-        logResult.append("Score:");
-        for (int i = 0; i < scores.length; i++) {
-            logResult.append(scores[i] + ",");
-        }
-        logResult.append("\n");
-    }
-
-    private void addEndOfGameToLog(List<Integer> winners) {
-        logResult.append("EndGame:");
-        for (int i = 0; i < scores.length; i++) {
-            logResult.append(scores[i] + ",");
-        }
-        logResult.append("\n");
-        logResult.append("Winners:" + String.join(", ", winners.stream().map(String::valueOf).collect(Collectors.toList())));
-    }
-
     private void playGame() {
         // End trump suit
         Hand playingArea = null;
         int winner = 0;
         int roundNumber = 1;
-        for (int i = 0; i < nbPlayers; i++) updateScore(i);
+        for (int i = 0; i < nbPlayers; i++) score.updateScore(i);
         boolean isContinue = true;
         int skipCount = 0;
         List<Card>cardsPlayed = new ArrayList<>();
         playingArea = new Hand(deck);
-        addRoundInfoToLog(roundNumber);
+        logger.addRoundInfoToLog(roundNumber);
 
         int nextPlayer = playerIndexWithAceClub();
         while(isContinue) {
@@ -368,7 +296,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
 
             playingArea.setView(this, new RowLayout(trickLocation, (playingArea.getNumberOfCards() + 2) * trickWidth));
             playingArea.draw();
-            addCardPlayedToLog(nextPlayer, selected);
+            logger.addCardPlayedToLog(nextPlayer, selected);
             if (selected != null) {
                 skipCount = 0;
                 cardsPlayed.add(selected);
@@ -388,11 +316,11 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
                 playingArea.draw();
                 winner = (nextPlayer + 1) % nbPlayers;
                 skipCount = 0;
-                calculateScoreEndOfRound(winner, cardsPlayed);
-                updateScore(winner);
-                addEndOfRoundToLog();
+                score.calculateScoreEndOfRound(winner, cardsPlayed);
+                score.updateScore(winner);
+                logger.addEndOfRoundToLog();
                 roundNumber++;
-                addRoundInfoToLog(roundNumber);
+                logger.addRoundInfoToLog(roundNumber);
                 cardsPlayed = new ArrayList<>();
                 delay(delayTime);
                 playingArea = new Hand(deck);
@@ -402,8 +330,8 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
                     hands[2].getNumberOfCards() > 0 && hands[3].getNumberOfCards() > 0;
             if (!isContinue) {
                 winner = nextPlayer;
-                calculateScoreEndOfRound(winner, cardsPlayed);
-                addEndOfRoundToLog();
+                score.calculateScoreEndOfRound(winner, cardsPlayed);
+                logger.addEndOfRoundToLog();
             } else {
                 nextPlayer = (nextPlayer + 1) % nbPlayers;
             }
@@ -411,52 +339,24 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         }
 
         for (int i = 0; i < nbPlayers; i++) {
-            calculateNegativeScoreEndOfGame(i, hands[i].getCardList());
-            updateScore(i);
+            score.calculateNegativeScoreEndOfGame(i, hands[i].getCardList());
+            score.updateScore(i);
         }
     }
 
-    private void setupPlayerAutoMovements() {
-        String player0AutoMovement = properties.getProperty("players.0.cardsPlayed");
-        String player1AutoMovement = properties.getProperty("players.1.cardsPlayed");
-        String player2AutoMovement = properties.getProperty("players.2.cardsPlayed");
-        String player3AutoMovement = properties.getProperty("players.3.cardsPlayed");
 
-        String[] playerMovements = new String[] {"", "", "", ""};
-        if (player0AutoMovement != null) {
-            playerMovements[0] = player0AutoMovement;
-        }
-
-        if (player1AutoMovement != null) {
-            playerMovements[1] = player1AutoMovement;
-        }
-
-        if (player2AutoMovement != null) {
-            playerMovements[2] = player2AutoMovement;
-        }
-
-        if (player3AutoMovement != null) {
-            playerMovements[3] = player3AutoMovement;
-        }
-
-        for (int i = 0; i < playerMovements.length; i++) {
-            String movementString = playerMovements[i];
-            List<String> movements = Arrays.asList(movementString.split(","));
-            playerAutoMovements.add(movements);
-        }
-    }
 
     public String runApp() {
         setTitle("CountingUpGame (V" + version + ") Constructed for UofM SWEN30006 with JGameGrid (www.aplu.ch)");
         setStatusText("Initializing...");
-        initScores();
-        initScore();
-        addKeyListener(this);
-        setupPlayerAutoMovements();
+        score.initScores();
+        score.initScore();
+        addKeyListener(controller);
+        controller.setupPlayerAutoMovements();
         initGame();
         playGame();
 
-        for (int i = 0; i < nbPlayers; i++) updateScore(i);
+        for (int i = 0; i < nbPlayers; i++) score.updateScore(i);
         int maxScore = 0;
         for (int i = 0; i < nbPlayers; i++) if (scores[i] > maxScore) maxScore = scores[i];
         List<Integer> winners = new ArrayList<Integer>();
@@ -472,7 +372,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         addActor(new Actor("sprites/gameover.gif"), textLocation);
         setStatusText(winText);
         refresh();
-        addEndOfGameToLog(winners);
+        logger.addEndOfGameToLog(winners);
 
         return logResult.toString();
     }
@@ -481,6 +381,12 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         super(700, 700, 30);
         this.properties = properties;
         this.dealer = new CardDealer(properties);
+<<<<<<< Updated upstream
+=======
+        this.logger = new Logger();
+        this.score  = new Score(this);
+        this.controller=new PlayerController(this,properties);
+>>>>>>> Stashed changes
         isAuto = Boolean.parseBoolean(properties.getProperty("isAuto"));
         thinkingTime = Integer.parseInt(properties.getProperty("thinkingTime", "200"));
         delayTime = Integer.parseInt(properties.getProperty("delayTime", "100"));
