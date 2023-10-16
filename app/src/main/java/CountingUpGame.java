@@ -26,19 +26,14 @@ public class CountingUpGame extends CardGame  {
     public boolean rankGreater(Card card1, Card card2) {
         return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
     }
-// new in -----------------------------------------------------------------------------------------------------------------------
+    // new in -----------------------------------------------------------------------------------------------------------------------
     public CardDealer dealer = new CardDealer(properties);
     public Logger logger = new Logger();
 
-<<<<<<< Updated upstream
-    public CardDealer dealer = new CardDealer(properties);
-
-=======
     public Score score = new  Score(this);
 
     public PlayerController controller = new PlayerController(this,properties);
-//new in-----------------------------------------------------------------------------------------------------------------------
->>>>>>> Stashed changes
+    //new in-----------------------------------------------------------------------------------------------------------------------
     private final String version = "1.0";
     public final int nbPlayers = 4;
     public final int nbStartCards = 13;
@@ -118,102 +113,6 @@ public class CountingUpGame extends CardGame  {
     }
 
 
-<<<<<<< Updated upstream
-    // return random Enum value
-//    public static <T extends Enum<?>> T randomEnum(Class<T> clazz) {
-//        int x = random.nextInt(clazz.getEnumConstants().length);
-//        return clazz.getEnumConstants()[x];
-//    }
-//
-//    // return random Card from ArrayList
-//    public static Card randomCard(ArrayList<Card> list) {
-//        int x = random.nextInt(list.size());
-//        return list.get(x);
-//    }
-//
-//    public static Card getRandomCardOrSkip(ArrayList<Card> list) {
-//        int isSkip = random.nextInt(2);
-//        if (isSkip == 1) {
-//            return null;
-//        }
-//
-//        int x = random.nextInt(list.size());
-//        return list.get(x);
-//    }
-
-//    private Rank getRankFromString(String cardName) {
-//        String rankString = cardName.substring(0, cardName.length() - 1);
-//        Integer rankValue = Integer.parseInt(rankString);
-//
-//        for (Rank rank : Rank.values()) {
-//            if (rank.getRankCardValue() == rankValue) {
-//                return rank;
-//            }
-//        }
-//
-//        return Rank.ACE;
-//    }
-//
-//    private Suit getSuitFromString(String cardName) {
-//        String suitString = cardName.substring(cardName.length() - 1);
-//
-//        for (Suit suit : Suit.values()) {
-//            if (suit.getSuitShortHand().equals(suitString)) {
-//                return suit;
-//            }
-//        }
-//        return Suit.CLUBS;
-//    }
-//
-//    private Card getCardFromList(List<Card> cards, String cardName) {
-//        Rank cardRank = getRankFromString(cardName);
-//        Suit cardSuit = getSuitFromString(cardName);
-//        for (Card card: cards) {
-//            if (card.getSuit() == cardSuit
-//                    && card.getRank() == cardRank) {
-//                return card;
-//            }
-//        }
-//
-//        return null;
-//    }
-
-//    private void dealingOut(Hand[] hands, int nbPlayers, int nbCardsPerPlayer) {
-//        Hand pack = deck.toHand(false);
-//        int[] cardsDealtPerPlayer = new int[nbPlayers];
-//
-//        for (int i = 0; i < nbPlayers; i++) {
-//            String initialCardsKey = "players." + i + ".initialcards";
-//            String initialCardsValue = properties.getProperty(initialCardsKey);
-//            if (initialCardsValue == null) {
-//                continue;
-//            }
-//            String[] initialCards = initialCardsValue.split(",");
-//            for (String initialCard: initialCards) {
-//                if (initialCard.length() <= 1) {
-//                    continue;
-//                }
-//                Card card = getCardFromList(pack.getCardList(), initialCard);
-//                if (card != null) {
-//                    card.removeFromHand(false);
-//                    hands[i].insert(card, false);
-//                }
-//            }
-//        }
-//
-//        for (int i = 0; i < nbPlayers; i++) {
-//            int cardsToDealt = nbCardsPerPlayer - hands[i].getNumberOfCards();
-//            for (int j = 0; j < cardsToDealt; j++) {
-//                if (pack.isEmpty()) return;
-//                Card dealt = randomCard(pack.getCardList());
-//                dealt.removeFromHand(false);
-//                hands[i].insert(dealt, false);
-//            }
-//        }
-//    }
-
-=======
->>>>>>> Stashed changes
     private int playerIndexWithAceClub() {
         for (int i = 0; i < nbPlayers; i++) {
             Hand hand = hands[i];
@@ -381,12 +280,9 @@ public class CountingUpGame extends CardGame  {
         super(700, 700, 30);
         this.properties = properties;
         this.dealer = new CardDealer(properties);
-<<<<<<< Updated upstream
-=======
         this.logger = new Logger();
         this.score  = new Score(this);
         this.controller=new PlayerController(this,properties);
->>>>>>> Stashed changes
         isAuto = Boolean.parseBoolean(properties.getProperty("isAuto"));
         thinkingTime = Integer.parseInt(properties.getProperty("thinkingTime", "200"));
         delayTime = Integer.parseInt(properties.getProperty("delayTime", "100"));
