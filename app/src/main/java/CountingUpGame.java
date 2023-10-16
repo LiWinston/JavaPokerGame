@@ -18,11 +18,12 @@ public class CountingUpGame extends CardGame  {
     final String trumpImage[] = {"bigspade.gif", "bigheart.gif", "bigdiamond.gif", "bigclub.gif"};
 
     static public final int seed = 30008;
-    static final Random random = new Random(seed);
+
     private Properties properties;
     private StringBuilder logResult = new StringBuilder();
 //    private List<List<String>> playerAutoMovements = new ArrayList<>();
 
+<<<<<<< Updated upstream
     public boolean rankGreater(Card card1, Card card2) {
         return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
     }
@@ -30,6 +31,13 @@ public class CountingUpGame extends CardGame  {
     public CardDealer dealer = new CardDealer(properties);
     public Logger logger = new Logger();
 
+=======
+
+// new in -----------------------------------------------------------------------------------------------------------------------
+    public CardDealer dealer = new CardDealer(properties);
+    public Logger logger = new Logger();
+
+>>>>>>> Stashed changes
     public Score score = new  Score(this);
 
     public PlayerController controller = new PlayerController(this,properties);
@@ -47,14 +55,8 @@ public class CountingUpGame extends CardGame  {
             new Location(350, 75),
             new Location(625, 350)
     };
-    private final Location[] scoreLocations = {
-            new Location(575, 675),
-            new Location(25, 575),
-            new Location(575, 25),
-            // new Location(650, 575)
-            new Location(575, 575)
-    };
-    private Actor[] scoreActors = {null, null, null, null};
+
+
     private final Location trickLocation = new Location(350, 350);
     private final Location textLocation = new Location(350, 450);
     private int thinkingTime = 2000;
@@ -72,15 +74,26 @@ public class CountingUpGame extends CardGame  {
     private boolean passSelected = false;
     private int[] autoIndexHands = new int [nbPlayers];
     private boolean isAuto = false;
+<<<<<<< Updated upstream
 
     Font bigFont = new Font("Arial", Font.BOLD, 36);
+=======
+>>>>>>> Stashed changes
     private Card selected;
+    private Card lastPlayedCard = null;
 
 
 
 
 
 
+<<<<<<< Updated upstream
+
+
+
+
+=======
+>>>>>>> Stashed changes
 
     private void initGame() {
         hands = new Hand[nbPlayers];
@@ -92,13 +105,17 @@ public class CountingUpGame extends CardGame  {
             hands[i].sort(Hand.SortType.SUITPRIORITY, false);
         }
         // Set up human player for interaction
-        CardListener cardListener = new CardAdapter()  // Human Player plays card
-        {
+        CardListener cardListener = new CardAdapter() {
             public void leftDoubleClicked(Card card) {
-                selected = card;
-                hands[0].setTouchEnabled(false);
+                if (isValidCardToPlay(card)) {
+                    selected = card;
+                    hands[0].setTouchEnabled(false);
+                } else {
+                    setStatus("Invalid card. Please select a valid card to play.");
+                }
             }
         };
+
         hands[0].addCardListener(cardListener);
         // graphics
         RowLayout[] layouts = new RowLayout[nbPlayers];
@@ -129,9 +146,32 @@ public class CountingUpGame extends CardGame  {
 
         return 0;
     }
+<<<<<<< Updated upstream
 
     private void playGame() {
 
+=======
+    public boolean isRankGreater(Card card1, Card card2) {
+        return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
+    }
+
+
+    private boolean isValidCardToPlay(Card card) {
+        if (lastPlayedCard == null) return true;
+
+        if (card.getSuit() == lastPlayedCard.getSuit()) {
+            return isRankGreater(card, lastPlayedCard);
+        } else if (card.getRank() == lastPlayedCard.getRank()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void playGame() {
+
+
+>>>>>>> Stashed changes
         // End trump suit
         Hand playingArea = null;
         int winner = 0;
@@ -147,29 +187,40 @@ public class CountingUpGame extends CardGame  {
         while(isContinue) {
             selected = null;
             boolean finishedAuto = false;
+<<<<<<< Updated upstream
             if (isAuto) {
                 int nextPlayerAutoIndex = autoIndexHands[nextPlayer];
                 List<String> nextPlayerMovement = controller.getPlayerMovement(nextPlayer);
                 String nextMovement = "";
+=======
+            if (!isAuto || finishedAuto){
+                if (0 == nextPlayer) {
+                    hands[0].setTouchEnabled(true);
+                    isWaitingForPass = true;
+                    passSelected = false;
+                    setStatus("Player 0 double-click on card to follow or press Enter to pass");
+                    while (null == selected && !passSelected) delay(delayTime);
+                    isWaitingForPass = false;
+                } else {
+                    setStatusText("Player " + nextPlayer + " thinking...");
+                    delay(thinkingTime);
+                    do {
+                        selected = dealer.getRandomCardOrSkip(hands[nextPlayer].getCardList());
+                    } while (selected != null && !isValidCardToPlay(selected)); // Ensure the selected card is valid
+>>>>>>> Stashed changes
 
-                if (nextPlayerMovement.size() > nextPlayerAutoIndex) {
-                    nextMovement = nextPlayerMovement.get(nextPlayerAutoIndex);
-                    nextPlayerAutoIndex++;
-
-                    autoIndexHands[nextPlayer] = nextPlayerAutoIndex;
-                    Hand nextHand = hands[nextPlayer];
-
-                    if (nextMovement.equals("SKIP")) {
+                    if (selected == null) {
                         setStatusText("Player " + nextPlayer + " skipping...");
                         delay(thinkingTime);
+<<<<<<< Updated upstream
                         selected = null;
                     } else {
                         setStatusText("Player " + nextPlayer + " thinking...");
                         delay(thinkingTime);
                         selected = dealer.getCardFromList(nextHand.getCardList(), nextMovement);
+=======
+>>>>>>> Stashed changes
                     }
-                } else {
-                    finishedAuto = true;
                 }
             }
 
@@ -198,6 +249,7 @@ public class CountingUpGame extends CardGame  {
             playingArea.draw();
             logger.addCardPlayedToLog(nextPlayer, selected);
             if (selected != null) {
+                lastPlayedCard = selected;
                 skipCount = 0;
                 cardsPlayed.add(selected);
                 selected.setVerso(false);  // In case it is upside down
