@@ -1,5 +1,7 @@
 // CountingUpGame.java
 
+
+
 import ch.aplu.jcardgame.*;
 import ch.aplu.jgamegrid.*;
 import org.checkerframework.checker.units.qual.C;
@@ -23,25 +25,15 @@ public class CountingUpGame extends CardGame  {
     private StringBuilder logResult = new StringBuilder();
 //    private List<List<String>> playerAutoMovements = new ArrayList<>();
 
-<<<<<<< Updated upstream
-    public boolean rankGreater(Card card1, Card card2) {
-        return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
-    }
-// new in -----------------------------------------------------------------------------------------------------------------------
+
+    // new in -----------------------------------------------------------------------------------------------------------------------
     public CardDealer dealer = new CardDealer(properties);
     public Logger logger = new Logger();
 
-=======
-
-// new in -----------------------------------------------------------------------------------------------------------------------
-    public CardDealer dealer = new CardDealer(properties);
-    public Logger logger = new Logger();
-
->>>>>>> Stashed changes
     public Score score = new  Score(this);
 
     public PlayerController controller = new PlayerController(this,properties);
-//new in-----------------------------------------------------------------------------------------------------------------------
+    //new in-----------------------------------------------------------------------------------------------------------------------
     private final String version = "1.0";
     public final int nbPlayers = 4;
     public final int nbStartCards = 13;
@@ -74,11 +66,6 @@ public class CountingUpGame extends CardGame  {
     private boolean passSelected = false;
     private int[] autoIndexHands = new int [nbPlayers];
     private boolean isAuto = false;
-<<<<<<< Updated upstream
-
-    Font bigFont = new Font("Arial", Font.BOLD, 36);
-=======
->>>>>>> Stashed changes
     private Card selected;
     private Card lastPlayedCard = null;
 
@@ -87,13 +74,6 @@ public class CountingUpGame extends CardGame  {
 
 
 
-<<<<<<< Updated upstream
-
-
-
-
-=======
->>>>>>> Stashed changes
 
     private void initGame() {
         hands = new Hand[nbPlayers];
@@ -146,11 +126,6 @@ public class CountingUpGame extends CardGame  {
 
         return 0;
     }
-<<<<<<< Updated upstream
-
-    private void playGame() {
-
-=======
     public boolean isRankGreater(Card card1, Card card2) {
         return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
     }
@@ -171,7 +146,6 @@ public class CountingUpGame extends CardGame  {
     private void playGame() {
 
 
->>>>>>> Stashed changes
         // End trump suit
         Hand playingArea = null;
         int winner = 0;
@@ -187,12 +161,6 @@ public class CountingUpGame extends CardGame  {
         while(isContinue) {
             selected = null;
             boolean finishedAuto = false;
-<<<<<<< Updated upstream
-            if (isAuto) {
-                int nextPlayerAutoIndex = autoIndexHands[nextPlayer];
-                List<String> nextPlayerMovement = controller.getPlayerMovement(nextPlayer);
-                String nextMovement = "";
-=======
             if (!isAuto || finishedAuto){
                 if (0 == nextPlayer) {
                     hands[0].setTouchEnabled(true);
@@ -207,19 +175,10 @@ public class CountingUpGame extends CardGame  {
                     do {
                         selected = dealer.getRandomCardOrSkip(hands[nextPlayer].getCardList());
                     } while (selected != null && !isValidCardToPlay(selected)); // Ensure the selected card is valid
->>>>>>> Stashed changes
 
                     if (selected == null) {
                         setStatusText("Player " + nextPlayer + " skipping...");
                         delay(thinkingTime);
-<<<<<<< Updated upstream
-                        selected = null;
-                    } else {
-                        setStatusText("Player " + nextPlayer + " thinking...");
-                        delay(thinkingTime);
-                        selected = dealer.getCardFromList(nextHand.getCardList(), nextMovement);
-=======
->>>>>>> Stashed changes
                     }
                 }
             }
