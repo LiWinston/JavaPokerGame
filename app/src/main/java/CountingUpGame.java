@@ -67,7 +67,7 @@ public class CountingUpGame extends CardGame {
 
     public String runApp() {
         setTitle("CountingUpGame (V" + version + ") Constructed for UofM SWEN30006 with JGameGrid (www.aplu.ch)");
-        setStatusText("Initializing...");
+        setStatus("Initializing...");
         initPlayers();
         score.initScores();
         score.initScore();
@@ -88,7 +88,7 @@ public class CountingUpGame extends CardGame {
             winText = "Game Over. Drawn winners are players: " + String.join(", ", winners.stream().map(String::valueOf).collect(Collectors.toList()));
         }
         addActor(new Actor("sprites/gameover.gif"), textLocation);
-        setStatusText(winText);
+        setStatus(winText);
         refresh();
         logger.addEndOfGameToLog(winners);
 
@@ -208,14 +208,14 @@ public class CountingUpGame extends CardGame {
                     while (null == selected && !passSelected) delay(delayTime);
                     isWaitingForPass = false;
                 } else {
-                    setStatusText("Player " + nextPlayer + " thinking...");
+                    setStatus("Player " + nextPlayer + " thinking...");
                     delay(thinkingTime);
                     do {
                         selected = controller.getRandomCardOrSkip(hands[nextPlayer].getCardList());
                     } while (selected != null && !isValidCardToPlay(selected)); // Ensure the selected card is valid
 
                     if (selected == null) {
-                        setStatusText("Player " + nextPlayer + " skipping...");
+                        setStatus("Player " + nextPlayer + " skipping...");
                         delay(thinkingTime);
                     }
                 }
@@ -230,11 +230,11 @@ public class CountingUpGame extends CardGame {
                     while (null == selected && !passSelected) delay(delayTime);
                     isWaitingForPass = false;
                 } else {
-                    setStatusText("Player " + nextPlayer + " thinking...");
+                    setStatus("Player " + nextPlayer + " thinking...");
                     delay(thinkingTime);
                     selected = controller.getRandomCardOrSkip(hands[nextPlayer].getCardList());
                     if (selected == null) {
-                        setStatusText("Player " + nextPlayer + " skipping...");
+                        setStatus("Player " + nextPlayer + " skipping...");
                         delay(thinkingTime);
                     }
                 }
