@@ -1,83 +1,108 @@
 // CountingUpGame.java
 
 import ch.aplu.jcardgame.*;
-import ch.aplu.jgamegrid.*;
-import org.checkerframework.checker.units.qual.C;
+import ch.aplu.jgamegrid.Actor;
+import ch.aplu.jgamegrid.Location;
 
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
-public class CountingUpGame extends CardGame  {
+public class CountingUpGame extends CardGame {
 
-
-
-    final String trumpImage[] = {"bigspade.gif", "bigheart.gif", "bigdiamond.gif", "bigclub.gif"};
-
+    private static CountingUpGame instance; // 单例实例
     static public final int seed = 30008;
-
-    private Properties properties;
-    private StringBuilder logResult = new StringBuilder();
-//    private List<List<String>> playerAutoMovements = new ArrayList<>();
-
-
-    // new in -----------------------------------------------------------------------------------------------------------------------
-    public CardDealer dealer = new CardDealer(properties);
-    public Logger logger = new Logger();
-
-    public Score score = new  Score(this);
-
-    public PlayerController controller = new PlayerController(this,properties);
-    //new in-----------------------------------------------------------------------------------------------------------------------
-    private final String version = "1.0";
     public final int nbPlayers = 4;
     public final int nbStartCards = 13;
     public final int nbRounds = 3;
+//    private List<List<String>> playerAutoMovements = new ArrayList<>();
+    final String[] trumpImage = {"bigspade.gif", "bigheart.gif", "bigdiamond.gif", "bigclub.gif"};
+    //new in-----------------------------------------------------------------------------------------------------------------------
+    private final String version = "1.0";
     private final int handWidth = 400;
     private final int trickWidth = 40;
-    private final Deck deck = new Deck(Suit.values(), Rank.values(), "cover");
-    private final Location[] handLocations = {
-            new Location(350, 625),
-            new Location(75, 350),
-            new Location(350, 75),
-            new Location(625, 350)
-    };
-
-
+    public final Deck deck = new Deck(Suit.values(), Rank.values(), "cover");
+    private final Location[] handLocations = {new Location(350, 625), new Location(75, 350), new Location(350, 75), new Location(625, 350)};
     private final Location trickLocation = new Location(350, 350);
     private final Location textLocation = new Location(350, 450);
+    public Logger logger = new Logger();
+    public Score score = new Score(this);
+    public boolean isWaitingForPass = false;
+    public boolean passSelected = false;
+    private Properties properties;
+    // new in -----------------------------------------------------------------------------------------------------------------------
+    public CardDealer dealer = new CardDealer(properties);
+    public PlayerController controller = new PlayerController(this, properties);
+    private final StringBuilder logResult = new StringBuilder();
     private int thinkingTime = 2000;
     private int delayTime = 600;
     private Hand[] hands;
-    private Location hideLocation = new Location(-500, -500);
+    private final Location hideLocation = new Location(-500, -500);
+    private final int[] scores = new int[nbPlayers];
+    private Player[] players = new Player[nbPlayers];
+    private final int[] autoIndexHands = new int[nbPlayers];
+    private boolean isAuto = false;
+    private Card selected;
+    private Card lastPlayedCard = null;
+    public CountingUpGame(Properties properties) {
+        super(700, 700, 30);
+        this.properties = properties;
+        this.dealer = new CardDealer(properties);
+        this.logger = new Logger();
+        this.score = new Score(this);
+        this.controller = new PlayerController(this, properties);
+        isAuto = Boolean.parseBoolean(properties.getProperty("isAuto"));
+        thinkingTime = Integer.parseInt(properties.getProperty("thinkingTime", "200"));
+        delayTime = Integer.parseInt(properties.getProperty("delayTime", "100"));
+        for (int i = 0; i < 4; i++) {
+            String playerKey = "players." + i;
+            String playerTypeStr = properties.getProperty(playerKey);
+            players[i] = new Player(playerTypeStr, i);
+        }
+        instance = this;
+    }
+
+    public static CountingUpGame Instance() {
+        return instance;
+    }
+
+    public String runApp() {
+        setTitle("CountingUpGame (V" + version + ") Constructed for UofM SWEN30006 with JGameGrid (www.aplu.ch)");
+        setStatusText("Initializing...");
+        score.initScores();
+        score.initScore();
+        addKeyListener(controller);
+        controller.setupPlayerAutoMovements();
+        initGame();
+        playGame();
+
+        for (int i = 0; i < nbPlayers; i++) score.updateScore(i);
+        int maxScore = 0;
+        for (int i = 0; i < nbPlayers; i++) if (scores[i] > maxScore) maxScore = scores[i];
+        List<Integer> winners = new ArrayList<Integer>();
+        for (int i = 0; i < nbPlayers; i++) if (scores[i] == maxScore) winners.add(i);
+        String winText;
+        if (winners.size() == 1) {
+            winText = "Game over. Winner is player: " + winners.iterator().next();
+        } else {
+            winText = "Game Over. Drawn winners are players: " + String.join(", ", winners.stream().map(String::valueOf).collect(Collectors.toList()));
+        }
+        addActor(new Actor("sprites/gameover.gif"), textLocation);
+        setStatusText(winText);
+        refresh();
+        logger.addEndOfGameToLog(winners);
+
+        return logResult.toString();
+    }
 
     public void setStatus(String string) {
         setStatusText(string);
     }
 
-    private int[] scores = new int[nbPlayers];
-
-    public boolean isWaitingForPass = false;
-    public boolean passSelected = false;
-    private int[] autoIndexHands = new int [nbPlayers];
-    private boolean isAuto = false;
-    private Card selected;
-    private Card lastPlayedCard = null;
-
-
-
-
-
-
-
     private void initGame() {
         hands = new Hand[nbPlayers];
-        for (int i = 0; i < nbPlayers; i++) {
-            hands[i] = new Hand(deck);
-        }
         dealer.dealingOut(hands, nbPlayers, nbStartCards);
         for (int i = 0; i < nbPlayers; i++) {
             hands[i].sort(Hand.SortType.SUITPRIORITY, false);
@@ -107,7 +132,6 @@ public class CountingUpGame extends CardGame  {
         }
     }
 
-
     private int playerIndexWithAceClub() {
         for (int i = 0; i < nbPlayers; i++) {
             Hand hand = hands[i];
@@ -115,36 +139,29 @@ public class CountingUpGame extends CardGame  {
             if (cards.size() == 0) {
                 continue;
             }
-            for (Card card: cards) {
+            for (Card card : cards) {
                 if (card.getSuit() == Suit.CLUBS) {
                     return i;
                 }
             }
         }
-
         return 0;
     }
+
     public boolean isRankGreater(Card card1, Card card2) {
         return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
     }
-
 
     public boolean isValidCardToPlay(Card card) {
         if (lastPlayedCard == null) return true;
 
         if (card.getSuit() == lastPlayedCard.getSuit()) {
             return isRankGreater(card, lastPlayedCard);
-        } else if (card.getRank() == lastPlayedCard.getRank()) {
-            return true;
-        }
-
-        return false;
+        } else return card.getRank() == lastPlayedCard.getRank();
     }
 
     private void playGame() {
         boolean isFirstTurn = true;
-
-
 
         // End trump suit
         Hand playingArea = null;
@@ -153,26 +170,25 @@ public class CountingUpGame extends CardGame  {
         for (int i = 0; i < nbPlayers; i++) score.updateScore(i);
         boolean isContinue = true;
         int skipCount = 0;
-        List<Card>cardsPlayed = new ArrayList<>();
+        List<Card> cardsPlayed = new ArrayList<>();
         playingArea = new Hand(deck);
         logger.addRoundInfoToLog(roundNumber);
 
         int nextPlayer = playerIndexWithAceClub();
-        while(isContinue) {
+        while (isContinue) {
             selected = null;
             boolean finishedAuto = false;
-            if (nextPlayer == playerIndexWithAceClub()&& isFirstTurn) {
+            if (nextPlayer == playerIndexWithAceClub() && isFirstTurn) {
                 selected = dealer.getCardFromList(hands[nextPlayer].getCardList(), "1C");
                 if (selected != null) {
                     selected.transfer(playingArea, true);
                     cardsPlayed.add(selected);
-                    isFirstTurn= false;
+                    isFirstTurn = false;
                     continue;
                 }
             }
 
-
-            if (isAuto){
+            if (isAuto) {
                 if (0 == nextPlayer) {
                     hands[0].setTouchEnabled(true);
                     isWaitingForPass = true;
@@ -194,7 +210,7 @@ public class CountingUpGame extends CardGame  {
                 }
             }
 
-            if (!isAuto || finishedAuto){
+            if (!isAuto || finishedAuto) {
                 if (0 == nextPlayer) {
                     hands[0].setTouchEnabled(true);
                     isWaitingForPass = true;
@@ -248,8 +264,7 @@ public class CountingUpGame extends CardGame  {
                 playingArea = new Hand(deck);
             }
 
-            isContinue = hands[0].getNumberOfCards() > 0 && hands[1].getNumberOfCards() > 0 &&
-                    hands[2].getNumberOfCards() > 0 && hands[3].getNumberOfCards() > 0;
+            isContinue = hands[0].getNumberOfCards() > 0 && hands[1].getNumberOfCards() > 0 && hands[2].getNumberOfCards() > 0 && hands[3].getNumberOfCards() > 0;
             if (!isContinue) {
                 winner = nextPlayer;
                 score.calculateScoreEndOfRound(winner, cardsPlayed);
@@ -264,51 +279,6 @@ public class CountingUpGame extends CardGame  {
             score.calculateNegativeScoreEndOfGame(i, hands[i].getCardList());
             score.updateScore(i);
         }
-    }
-
-
-
-    public String runApp() {
-        setTitle("CountingUpGame (V" + version + ") Constructed for UofM SWEN30006 with JGameGrid (www.aplu.ch)");
-        setStatusText("Initializing...");
-        score.initScores();
-        score.initScore();
-        addKeyListener(controller);
-        controller.setupPlayerAutoMovements();
-        initGame();
-        playGame();
-
-        for (int i = 0; i < nbPlayers; i++) score.updateScore(i);
-        int maxScore = 0;
-        for (int i = 0; i < nbPlayers; i++) if (scores[i] > maxScore) maxScore = scores[i];
-        List<Integer> winners = new ArrayList<Integer>();
-        for (int i = 0; i < nbPlayers; i++) if (scores[i] == maxScore) winners.add(i);
-        String winText;
-        if (winners.size() == 1) {
-            winText = "Game over. Winner is player: " +
-                    winners.iterator().next();
-        } else {
-            winText = "Game Over. Drawn winners are players: " +
-                    String.join(", ", winners.stream().map(String::valueOf).collect(Collectors.toList()));
-        }
-        addActor(new Actor("sprites/gameover.gif"), textLocation);
-        setStatusText(winText);
-        refresh();
-        logger.addEndOfGameToLog(winners);
-
-        return logResult.toString();
-    }
-
-    public CountingUpGame(Properties properties) {
-        super(700, 700, 30);
-        this.properties = properties;
-        this.dealer = new CardDealer(properties);
-        this.logger = new Logger();
-        this.score  = new Score(this);
-        this.controller=new PlayerController(this,properties);
-        isAuto = Boolean.parseBoolean(properties.getProperty("isAuto"));
-        thinkingTime = Integer.parseInt(properties.getProperty("thinkingTime", "200"));
-        delayTime = Integer.parseInt(properties.getProperty("delayTime", "100"));
     }
 }
 
