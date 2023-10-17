@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
-public class CountingUpGame extends CardGame implements GGKeyListener {
+public class CountingUpGame extends CardGame  {
+
+
 
     final String trumpImage[] = {"bigspade.gif", "bigheart.gif", "bigdiamond.gif", "bigclub.gif"};
 
@@ -259,7 +261,7 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         setStatusText("Initializing...");
         score.initScores();
         score.initScore();
-        addKeyListener(this);
+        addKeyListener(controller);
         controller.setupPlayerAutoMovements();
         initGame();
         playGame();
@@ -295,16 +297,6 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         isAuto = Boolean.parseBoolean(properties.getProperty("isAuto"));
         thinkingTime = Integer.parseInt(properties.getProperty("thinkingTime", "200"));
         delayTime = Integer.parseInt(properties.getProperty("delayTime", "100"));
-    }
-
-    public boolean keyPressed(KeyEvent keyEvent) {
-        if (isWaitingForPass && keyEvent.getKeyChar() == '\n') {
-            passSelected = true;
-        }
-        return false;
-    }
-    public boolean keyReleased(KeyEvent keyEvent) {
-        return false;
     }
 }
 

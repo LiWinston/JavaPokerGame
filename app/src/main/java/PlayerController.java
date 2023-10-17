@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PlayerController{
+public class PlayerController implements GGKeyListener{
 
     private CountingUpGame game;
     private boolean isWaitingForPass = false;
@@ -24,11 +24,21 @@ public class PlayerController{
     private Card selected;
 
 
-
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (isWaitingForPass && keyEvent.getKeyChar() == '\n') {
+            passSelected = true;
+        }
+        return false;
+    }
     public List<String> getPlayerMovement(int playerIndex) {
         return playerAutoMovements.get(playerIndex);
     }
 
+
+
+    public boolean keyReleased(KeyEvent keyEvent) {
+        return false;
+    }
 
     public void setupPlayerAutoMovements() {
         String player0AutoMovement = properties.getProperty("players.0.cardsPlayed");
