@@ -1,7 +1,5 @@
 // CountingUpGame.java
 
-
-
 import ch.aplu.jcardgame.*;
 import ch.aplu.jgamegrid.*;
 import org.checkerframework.checker.units.qual.C;
@@ -13,7 +11,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
-public class CountingUpGame extends CardGame implements GGKeyListener {
+public class CountingUpGame extends CardGame  {
+
+
 
     final String trumpImage[] = {"bigspade.gif", "bigheart.gif", "bigdiamond.gif", "bigclub.gif"};
 
@@ -60,8 +60,8 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
 
     private int[] scores = new int[nbPlayers];
 
-    private boolean isWaitingForPass = false;
-    private boolean passSelected = false;
+    public boolean isWaitingForPass = false;
+    public boolean passSelected = false;
     private int[] autoIndexHands = new int [nbPlayers];
     private boolean isAuto = false;
     private Card selected;
@@ -254,12 +254,13 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
     }
 
 
+
     public String runApp() {
         setTitle("CountingUpGame (V" + version + ") Constructed for UofM SWEN30006 with JGameGrid (www.aplu.ch)");
         setStatusText("Initializing...");
         score.initScores();
         score.initScore();
-        addKeyListener(this);
+        addKeyListener(controller);
         controller.setupPlayerAutoMovements();
         initGame();
         playGame();
@@ -295,16 +296,6 @@ public class CountingUpGame extends CardGame implements GGKeyListener {
         isAuto = Boolean.parseBoolean(properties.getProperty("isAuto"));
         thinkingTime = Integer.parseInt(properties.getProperty("thinkingTime", "200"));
         delayTime = Integer.parseInt(properties.getProperty("delayTime", "100"));
-    }
-
-    public boolean keyPressed(KeyEvent keyEvent) {
-        if (isWaitingForPass && keyEvent.getKeyChar() == '\n') {
-            passSelected = true;
-        }
-        return false;
-    }
-    public boolean keyReleased(KeyEvent keyEvent) {
-        return false;
     }
 }
 
