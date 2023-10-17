@@ -1,3 +1,5 @@
+import ch.aplu.jcardgame.Card;
+
 public enum Rank {
     ACE (1, 10), KING (13, 10), QUEEN (12, 10),
     JACK (11, 10), TEN (10, 10), NINE (9, 9),
@@ -12,6 +14,9 @@ public enum Rank {
         this.scoreCardValue = scoreCardValue;
     }
 
+    public static boolean isRankGreater(Card card1, Card card2) {
+        return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
+    }
     public int getRankCardValue() {
         return rankCardValue;
     }

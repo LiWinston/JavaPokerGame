@@ -159,15 +159,13 @@ public class CountingUpGame extends CardGame {
         return 0;
     }
 
-    public boolean isRankGreater(Card card1, Card card2) {
-        return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
-    }
+
 
     public boolean isValidCardToPlay(Card card) {
         if (lastPlayedCard == null) return true;
 
         if (card.getSuit() == lastPlayedCard.getSuit()) {
-            return isRankGreater(card, lastPlayedCard);
+            return Rank.isRankGreater(card, lastPlayedCard);
         } else return card.getRank() == lastPlayedCard.getRank();
     }
 
