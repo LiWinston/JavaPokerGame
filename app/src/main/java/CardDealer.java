@@ -19,7 +19,9 @@ public class CardDealer {
         this.properties= properties;
     }
 
-    public void dealingOut(Hand[] hands, int nbPlayers, int nbCardsPerPlayer) {
+    public void dealingOut() {
+//        var nbPlayers = Integer.parseInt(properties.getProperty("nbPlayers"));
+        var nbPlayers = CountingUpGame.Instance().nbPlayers;
         Hand pack = deck.toHand(false);
         int[] cardsDealtPerPlayer = new int[nbPlayers];
 
@@ -37,18 +39,18 @@ public class CardDealer {
                 Card card = getCardFromList(pack.getCardList(), initialCard);
                 if (card != null) {
                     card.removeFromHand(false);
-                    hands[i].insert(card, false);
+                    CountingUpGame.Instance().players[i].getHand().insert(card, false);
                 }
             }
         }
 
         for (int i = 0; i < nbPlayers; i++) {
-            int cardsToDealt = nbCardsPerPlayer - hands[i].getNumberOfCards();
+            int cardsToDealt =  CountingUpGame.Instance().nbStartCards - CountingUpGame.Instance().hands[i].getNumberOfCards();
             for (int j = 0; j < cardsToDealt; j++) {
                 if (pack.isEmpty()) return;
                 Card dealt = randomCard(pack.getCardList());
                 dealt.removeFromHand(false);
-                hands[i].insert(dealt, false);
+                CountingUpGame.Instance().hands[i].insert(dealt, false);
             }
         }
     }

@@ -23,7 +23,7 @@ public class CountingUpGame extends CardGame {
     private final String version = "1.0";
     private final int handWidth = 400;
     private final int trickWidth = 40;
-    public final Deck deck = new Deck(Suit.values(), Rank.values(), "cover");
+    public final Deck deck;
     private final Location[] handLocations = {new Location(350, 625), new Location(75, 350), new Location(350, 75), new Location(625, 350)};
     private final Location trickLocation = new Location(350, 350);
     private final Location textLocation = new Location(350, 450);
@@ -38,10 +38,10 @@ public class CountingUpGame extends CardGame {
     private final StringBuilder logResult = new StringBuilder();
     private int thinkingTime = 2000;
     private int delayTime = 600;
-    private Hand[] hands;
+    Hand[] hands;
     private final Location hideLocation = new Location(-500, -500);
     private final int[] scores = new int[nbPlayers];
-    private Player[] players = new Player[nbPlayers];
+    Player[] players;
     private final int[] autoIndexHands = new int[nbPlayers];
     private boolean isAuto = false;
     private Card selected;
@@ -56,11 +56,8 @@ public class CountingUpGame extends CardGame {
         isAuto = Boolean.parseBoolean(properties.getProperty("isAuto"));
         thinkingTime = Integer.parseInt(properties.getProperty("thinkingTime", "200"));
         delayTime = Integer.parseInt(properties.getProperty("delayTime", "100"));
-        for (int i = 0; i < 4; i++) {
-            String playerKey = "players." + i;
-            String playerTypeStr = properties.getProperty(playerKey);
-            players[i] = new Player(playerTypeStr, i);
-        }
+        deck = new Deck(Suit.values(), Rank.values(), "cover");
+
         instance = this;
     }
 
@@ -71,6 +68,7 @@ public class CountingUpGame extends CardGame {
     public String runApp() {
         setTitle("CountingUpGame (V" + version + ") Constructed for UofM SWEN30006 with JGameGrid (www.aplu.ch)");
         setStatusText("Initializing...");
+        initPlayers();
         score.initScores();
         score.initScore();
         addKeyListener(controller);
@@ -97,13 +95,26 @@ public class CountingUpGame extends CardGame {
         return logResult.toString();
     }
 
+    private void initPlayers() {
+        players = new Player[nbPlayers];
+        for (int i = 0; i < 4; i++) {
+            String playerKey = "players." + i;
+            String playerTypeStr = properties.getProperty(playerKey);
+            players[i] = new Player(playerTypeStr, i);
+        }
+        hands = new Hand[nbPlayers];
+        for (int i = 0; i < nbPlayers; i++) {
+            hands[i] = players[i].getHand();
+        }
+    }
+
     public void setStatus(String string) {
         setStatusText(string);
     }
 
     private void initGame() {
-        hands = new Hand[nbPlayers];
-        dealer.dealingOut(hands, nbPlayers, nbStartCards);
+//        hands = new Hand[nbPlayers];
+        dealer.dealingOut();
         for (int i = 0; i < nbPlayers; i++) {
             hands[i].sort(Hand.SortType.SUITPRIORITY, false);
         }
