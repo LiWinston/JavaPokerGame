@@ -161,7 +161,7 @@ public class CountingUpGame extends CardGame  {
         while(isContinue) {
             selected = null;
             boolean finishedAuto = false;
-            if (!isAuto || finishedAuto){
+            if (isAuto){
                 if (0 == nextPlayer) {
                     hands[0].setTouchEnabled(true);
                     isWaitingForPass = true;
@@ -254,7 +254,6 @@ public class CountingUpGame extends CardGame  {
             score.updateScore(i);
         }
     }
-
 
 
     public String runApp() {
