@@ -60,8 +60,8 @@ public class CountingUpGame extends CardGame {
         super(700, 700, 30);
         this.properties = properties;
         this.dealer = new CardDealer(properties);
-        this.logger = new Logger(score);
         this.score = new Score(this);
+        this.logger = new Logger(score);
         this.controller = new PlayerController(this, properties);
         isAuto = Boolean.parseBoolean(properties.getProperty("isAuto"));
         thinkingTime = Integer.parseInt(properties.getProperty("thinkingTime", "200"));
