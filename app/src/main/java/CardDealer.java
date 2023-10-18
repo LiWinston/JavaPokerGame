@@ -12,7 +12,7 @@ public class CardDealer {
 
 
     private static final Random random = new Random();
-    private final Deck deck = new Deck(Suit.values(), Rank.values(), "cover");
+//    private final Deck deck = new Deck(Suit.values(), Rank.values(), "cover");
     private Properties properties;
 
     public CardDealer(Properties properties){
@@ -22,7 +22,7 @@ public class CardDealer {
     public void dealingOut() {
 //        var nbPlayers = Integer.parseInt(properties.getProperty("nbPlayers"));
         var nbPlayers = CountingUpGame.Instance().nbPlayers;
-        Hand pack = deck.toHand(false);
+        Hand pack = CountingUpGame.Instance().deck.toHand(false);
         int[] cardsDealtPerPlayer = new int[nbPlayers];
 
         for (int i = 0; i < nbPlayers; i++) {
@@ -95,8 +95,10 @@ public class CardDealer {
     public Card getCardFromList(List<Card> cards, String cardName) {
         Rank cardRank = getRankFromString(cardName);
         Suit cardSuit = getSuitFromString(cardName);
+        Iterator<Card> iterator = cards.iterator();
         for (Card card: cards) {
             if (card.getSuit() == cardSuit && card.getRank() == cardRank) {
+                iterator.remove();
                 return card;
             }
         }
