@@ -95,10 +95,8 @@ public class CardDealer {
     public Card getCardFromList(List<Card> cards, String cardName) {
         Rank cardRank = getRankFromString(cardName);
         Suit cardSuit = getSuitFromString(cardName);
-        Iterator<Card> iterator = cards.iterator();
         for (Card card: cards) {
             if (card.getSuit() == cardSuit && card.getRank() == cardRank) {
-                iterator.remove();
                 return card;
             }
         }
