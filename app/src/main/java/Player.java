@@ -5,6 +5,7 @@ import ch.aplu.jcardgame.Hand;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Player {
     private final PlayerType playerType;
@@ -41,4 +42,27 @@ public class Player {
         HUMAN, RANDOM, BASIC, CLEVER
 
     }
+
+    public Card getRandomCardOrSkip(ArrayList<Card> list) {
+
+
+
+        ArrayList<Card> tempList = new ArrayList<>(list);
+
+        while (!tempList.isEmpty()) {
+            Random random = new Random();
+            int x = random.nextInt(tempList.size());
+            Card selectedCard = tempList.get(x);
+
+            if (CountingUpGame.Instance().isValidCardToPlay(selectedCard)) {
+                return selectedCard;
+            } else {
+                tempList.remove(x);
+            }
+        }
+
+
+        return null;
+    }
+
 }

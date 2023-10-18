@@ -209,7 +209,7 @@ public class CountingUpGame extends CardGame {
                     setStatus("Player " + nextPlayer + " thinking...");
                     delay(thinkingTime);
                     do {
-                        selected = controller.getRandomCardOrSkip(hands[nextPlayer].getCardList());
+                        selected = players[nextPlayer].getRandomCardOrSkip(hands[nextPlayer].getCardList());
                     } while (selected != null && !isValidCardToPlay(selected)); // Ensure the selected card is valid
 
                     if (selected == null) {
@@ -230,7 +230,7 @@ public class CountingUpGame extends CardGame {
                 } else {
                     setStatus("Player " + nextPlayer + " thinking...");
                     delay(thinkingTime);
-                    selected = controller.getRandomCardOrSkip(hands[nextPlayer].getCardList());
+                    selected = players[nextPlayer].getRandomCardOrSkip(hands[nextPlayer].getCardList());
                     if (selected == null) {
                         setStatus("Player " + nextPlayer + " skipping...");
                         delay(thinkingTime);

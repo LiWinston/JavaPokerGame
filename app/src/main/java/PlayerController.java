@@ -1,29 +1,23 @@
-import ch.aplu.jcardgame.*;
-import ch.aplu.jgamegrid.*;
-import org.checkerframework.checker.units.qual.C;
+import ch.aplu.jgamegrid.GGKeyListener;
 
-import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Properties;
 
-public class PlayerController implements GGKeyListener{
+public class PlayerController implements GGKeyListener {
 
-//    private CountingUpGame game;
+    //    private CountingUpGame game;
 //    public boolean isWaitingForPass = true;
     public boolean passSelected = false;
-    private static final Random random = new Random();
-    private Properties properties;
-    private List<List<String>> playerAutoMovements = new ArrayList<>();
+    private final Properties properties;
+    private final List<List<String>> playerAutoMovements = new ArrayList<>();
 
     public PlayerController(CountingUpGame game, Properties properties) {
-        this.properties= properties;
+        this.properties = properties;
         game.addKeyListener(this);
     }
-
-
-
 
     public boolean keyPressed(KeyEvent keyEvent) {
         System.out.println("yes i press!");
@@ -39,19 +33,17 @@ public class PlayerController implements GGKeyListener{
         return false;
     }
 
-
-
-
     public List<String> getPlayerMovement(int playerIndex) {
         return playerAutoMovements.get(playerIndex);
     }
+
     public void setupPlayerAutoMovements() {
         String player0AutoMovement = properties.getProperty("players.0.cardsPlayed");
         String player1AutoMovement = properties.getProperty("players.1.cardsPlayed");
         String player2AutoMovement = properties.getProperty("players.2.cardsPlayed");
         String player3AutoMovement = properties.getProperty("players.3.cardsPlayed");
 
-        String[] playerMovements = new String[] {"", "", "", ""};
+        String[] playerMovements = new String[]{"", "", "", ""};
         if (player0AutoMovement != null) {
             playerMovements[0] = player0AutoMovement;
         }
@@ -74,27 +66,5 @@ public class PlayerController implements GGKeyListener{
             playerAutoMovements.add(movements);
         }
     }
-
-    public Card getRandomCardOrSkip(ArrayList<Card> list) {
-
-
-
-        ArrayList<Card> tempList = new ArrayList<>(list);
-
-        while (!tempList.isEmpty()) {
-            int x = random.nextInt(tempList.size());
-            Card selectedCard = tempList.get(x);
-
-            if (CountingUpGame.Instance().isValidCardToPlay(selectedCard)) {
-                return selectedCard;
-            } else {
-                tempList.remove(x);
-            }
-        }
-
-
-        return null;
-    }
-
 
 }
