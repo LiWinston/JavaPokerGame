@@ -12,6 +12,7 @@ public class Player {
     protected Hand hand;
     protected int score;
     protected List<Card> playedCards;
+
     public Player(String playerTypeStr, int playerOrder) {
         this.playerType = PlayerType.valueOf(playerTypeStr.toUpperCase());
         this.hand = new Hand(CountingUpGame.Instance().deck);
@@ -38,15 +39,7 @@ public class Player {
     public void playCard(CountingUpGame game) {
     }
 
-    public enum PlayerType {
-        HUMAN, RANDOM, BASIC, CLEVER
-
-    }
-
     public Card getRandomCardOrSkip(ArrayList<Card> list) {
-
-
-
         ArrayList<Card> tempList = new ArrayList<>(list);
 
         while (!tempList.isEmpty()) {
@@ -63,6 +56,11 @@ public class Player {
 
 
         return null;
+    }
+
+    public enum PlayerType {
+        HUMAN, RANDOM, BASIC, CLEVER
+
     }
 
 }
