@@ -20,7 +20,7 @@ public class CountingUpGame extends CardGame  {
     static public final int seed = 30008;
 
     private Properties properties;
-    private StringBuilder logResult = new StringBuilder();
+//    private StringBuilder logResult = new StringBuilder();
 //    private List<List<String>> playerAutoMovements = new ArrayList<>();
 
 
@@ -87,6 +87,7 @@ public class CountingUpGame extends CardGame  {
             public void leftDoubleClicked(Card card) {
                 if (isValidCardToPlay(card)) {
                     selected = card;
+
                     hands[0].setTouchEnabled(false);
                 } else {
                     setStatus("Invalid card. Please select a valid card to play.");
@@ -124,9 +125,20 @@ public class CountingUpGame extends CardGame  {
 
         return 0;
     }
+
     public boolean isRankGreater(Card card1, Card card2) {
-        return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
+        Enum rankEnum1 = card1.getRank();
+        Enum rankEnum2 = card2.getRank();
+
+        if (rankEnum1 instanceof Rank && rankEnum2 instanceof Rank) {
+            int rankValue1 = ((Rank) rankEnum1).getRankCardValue();
+            int rankValue2 = ((Rank) rankEnum2).getRankCardValue();
+            return rankValue1 > rankValue2;
+        }
+
+        return false;
     }
+
 
 
     public boolean isValidCardToPlay(Card card) {
@@ -134,6 +146,7 @@ public class CountingUpGame extends CardGame  {
 
         if (card.getSuit() == lastPlayedCard.getSuit()) {
             return isRankGreater(card, lastPlayedCard);
+
         } else if (card.getRank() == lastPlayedCard.getRank()) {
             return true;
         }
@@ -161,36 +174,42 @@ public class CountingUpGame extends CardGame  {
         while(isContinue) {
             selected = null;
             boolean finishedAuto = false;
-            if (nextPlayer == playerIndexWithAceClub()&& isFirstTurn) {
+            if (nextPlayer == playerIndexWithAceClub() && isFirstTurn) {
                 selected = dealer.getCardFromList(hands[nextPlayer].getCardList(), "1C");
-                if (selected != null) {
-                    selected.transfer(playingArea, true);
-                    cardsPlayed.add(selected);
-                    isFirstTurn= false;
-                    continue;
-                }
+                selected.transfer(playingArea, true);
+                cardsPlayed.add(selected);
+                isFirstTurn = false;
+                nextPlayer = (nextPlayer + 1) % nbPlayers;
+                lastPlayedCard=selected;
+
+                continue;
+
             }
 
 
-            if (isAuto){
-                if (0 == nextPlayer) {
-                    hands[0].setTouchEnabled(true);
-                    isWaitingForPass = true;
-                    passSelected = false;
-                    setStatus("Player 0 double-click on card to follow or press Enter to pass");
-                    while (null == selected && !passSelected) delay(delayTime);
-                    isWaitingForPass = false;
-                } else {
-                    setStatusText("Player " + nextPlayer + " thinking...");
-                    delay(thinkingTime);
-                    do {
-                        selected = controller.getRandomCardOrSkip(hands[nextPlayer].getCardList());
-                    } while (selected != null && !isValidCardToPlay(selected)); // Ensure the selected card is valid
+            if (isAuto) {
+                int nextPlayerAutoIndex = autoIndexHands[nextPlayer];
+                List<String> nextPlayerMovement = controller.playerAutoMovements.get(nextPlayer);
+                String nextMovement = "";
 
-                    if (selected == null) {
+                if (nextPlayerMovement.size() > nextPlayerAutoIndex) {
+                    nextMovement = nextPlayerMovement.get(nextPlayerAutoIndex);
+                    nextPlayerAutoIndex++;
+
+                    autoIndexHands[nextPlayer] = nextPlayerAutoIndex;
+                    Hand nextHand = hands[nextPlayer];
+
+                    if (nextMovement.equals("SKIP")) {
                         setStatusText("Player " + nextPlayer + " skipping...");
                         delay(thinkingTime);
+                        selected = null;
+                    } else {
+                        setStatusText("Player " + nextPlayer + " thinking...");
+                        delay(thinkingTime);
+                        selected = dealer.getCardFromList(nextHand.getCardList(), nextMovement);
                     }
+                } else {
+                    finishedAuto = true;
                 }
             }
 
@@ -234,6 +253,7 @@ public class CountingUpGame extends CardGame  {
             }
 
             if (skipCount == nbPlayers - 1) {
+                lastPlayedCard=null;
                 playingArea.setView(this, new RowLayout(hideLocation, 0));
                 playingArea.draw();
                 winner = (nextPlayer + 1) % nbPlayers;
@@ -296,7 +316,7 @@ public class CountingUpGame extends CardGame  {
         refresh();
         logger.addEndOfGameToLog(winners);
 
-        return logResult.toString();
+        return logger.logResult.toString();
     }
 
     public CountingUpGame(Properties properties) {
