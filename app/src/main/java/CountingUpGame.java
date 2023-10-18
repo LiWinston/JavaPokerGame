@@ -14,6 +14,20 @@ public class CountingUpGame extends CardGame {
 
     private static CountingUpGame instance; // 单例实例
     static public final int seed = 30008;
+
+    private Properties properties;
+//    private StringBuilder logResult = new StringBuilder();
+//    private List<List<String>> playerAutoMovements = new ArrayList<>();
+
+
+// new in -----------------------------------------------------------------------------------------------------------------------
+    public CardDealer dealer = new CardDealer(properties);
+
+
+    public Score score = new  Score(this);
+    public Logger logger = new Logger(score);
+    public PlayerController controller = new PlayerController(this,properties);
+//new in-----------------------------------------------------------------------------------------------------------------------
     public final int nbPlayers = 4;
     public final int nbStartCards = 13;
     public final int nbRounds = 3;
@@ -31,7 +45,6 @@ public class CountingUpGame extends CardGame {
     public Score score = new Score(this);
     public boolean isWaitingForPass = false;
     public boolean passSelected = false;
-    private Properties properties;
     // new in -----------------------------------------------------------------------------------------------------------------------
     public CardDealer dealer = new CardDealer(properties);
     public PlayerController controller = new PlayerController(this, properties);
@@ -50,7 +63,7 @@ public class CountingUpGame extends CardGame {
         super(700, 700, 30);
         this.properties = properties;
         this.dealer = new CardDealer(properties);
-        this.logger = new Logger();
+        this.logger = new Logger(score);
         this.score = new Score(this);
         this.controller = new PlayerController(this, properties);
         isAuto = Boolean.parseBoolean(properties.getProperty("isAuto"));
@@ -67,8 +80,7 @@ public class CountingUpGame extends CardGame {
 
     public String runApp() {
         setTitle("CountingUpGame (V" + version + ") Constructed for UofM SWEN30006 with JGameGrid (www.aplu.ch)");
-        setStatus("Initializing...");
-        initPlayers();
+        setStatusText("Initializing...");
         score.initScores();
         score.initScore();
         addKeyListener(controller);
@@ -78,22 +90,25 @@ public class CountingUpGame extends CardGame {
 
         for (int i = 0; i < nbPlayers; i++) score.updateScore(i);
         int maxScore = 0;
-        for (int i = 0; i < nbPlayers; i++) if (scores[i] > maxScore) maxScore = scores[i];
+        for (int i = 0; i < nbPlayers; i++) if (score.scores[i] > maxScore) maxScore = score.scores[i];
         List<Integer> winners = new ArrayList<Integer>();
-        for (int i = 0; i < nbPlayers; i++) if (scores[i] == maxScore) winners.add(i);
+        for (int i = 0; i < nbPlayers; i++) if (score.scores[i] == maxScore) winners.add(i);
         String winText;
         if (winners.size() == 1) {
-            winText = "Game over. Winner is player: " + winners.iterator().next();
+            winText = "Game over. Winner is player: " +
+                    winners.iterator().next();
         } else {
-            winText = "Game Over. Drawn winners are players: " + String.join(", ", winners.stream().map(String::valueOf).collect(Collectors.toList()));
+            winText = "Game Over. Drawn winners are players: " +
+                    String.join(", ", winners.stream().map(String::valueOf).collect(Collectors.toList()));
         }
         addActor(new Actor("sprites/gameover.gif"), textLocation);
-        setStatus(winText);
+        setStatusText(winText);
         refresh();
         logger.addEndOfGameToLog(winners);
 
-        return logResult.toString();
+        return logger.logResult.toString();
     }
+
 
     private void initPlayers() {
         players = new Player[nbPlayers];
@@ -112,6 +127,18 @@ public class CountingUpGame extends CardGame {
         setStatusText(string);
     }
 
+
+
+
+    private int[] autoIndexHands = new int [nbPlayers];
+
+
+
+
+
+
+
+
     private void initGame() {
 //        hands = new Hand[nbPlayers];
         dealer.dealingOut();
@@ -123,6 +150,7 @@ public class CountingUpGame extends CardGame {
             public void leftDoubleClicked(Card card) {
                 if (isValidCardToPlay(card)) {
                     selected = card;
+
                     hands[0].setTouchEnabled(false);
                 } else {
                     setStatus("Invalid card. Please select a valid card to play.");
@@ -159,14 +187,32 @@ public class CountingUpGame extends CardGame {
         return 0;
     }
 
+    public boolean isRankGreater(Card card1, Card card2) {
+        Enum rankEnum1 = card1.getRank();
+        Enum rankEnum2 = card2.getRank();
+
+        if (rankEnum1 instanceof Rank && rankEnum2 instanceof Rank) {
+            int rankValue1 = ((Rank) rankEnum1).getRankCardValue();
+            int rankValue2 = ((Rank) rankEnum2).getRankCardValue();
+            return rankValue1 > rankValue2;
+        }
+
+        return false;
+    }
+
 
 
     public boolean isValidCardToPlay(Card card) {
         if (lastPlayedCard == null) return true;
 
         if (card.getSuit() == lastPlayedCard.getSuit()) {
-            return Rank.isRankGreater(card, lastPlayedCard);
-        } else return card.getRank() == lastPlayedCard.getRank();
+            return isRankGreater(card, lastPlayedCard);
+
+        } else if (card.getRank() == lastPlayedCard.getRank()) {
+            return true;
+        }
+
+        return false;
     }
 
     private void playGame() {
@@ -187,39 +233,50 @@ public class CountingUpGame extends CardGame {
         while (isContinue) {
             selected = null;
             boolean finishedAuto = false;
-            if (nextPlayer == playerIndexWithAceClub() && isFirstTurn) {
-                selected = dealer.getCardFromList(hands[nextPlayer].getCardList(), "1C");
-                if (selected != null) {
+
+
+
+            if (isAuto) {
+                int nextPlayerAutoIndex = autoIndexHands[nextPlayer];
+                List<String> nextPlayerMovement = controller.playerAutoMovements.get(nextPlayer);
+                String nextMovement = "";
+
+                if (nextPlayerMovement.size() > nextPlayerAutoIndex) {
+                    nextMovement = nextPlayerMovement.get(nextPlayerAutoIndex);
+                    nextPlayerAutoIndex++;
+
+                    autoIndexHands[nextPlayer] = nextPlayerAutoIndex;
+                    Hand nextHand = hands[nextPlayer];
+
+                    if (nextMovement.equals("SKIP")) {
+                        setStatusText("Player " + nextPlayer + " skipping...");
+                        delay(thinkingTime);
+                        selected = null;
+                    } else {
+                        setStatusText("Player " + nextPlayer + " thinking...");
+                        delay(thinkingTime);
+                        selected = dealer.getCardFromList(nextHand.getCardList(), nextMovement);
+                        while (selected != null && !isValidCardToPlay(selected)) {
+                            selected=null;
+                        }
+                    }
+                } else {
+                    finishedAuto = true;
+                }
+            }
+
+            if (!isAuto || finishedAuto){
+                if (nextPlayer == playerIndexWithAceClub() && isFirstTurn) {
+                    selected = dealer.getCardFromList(hands[nextPlayer].getCardList(), "1C");
                     selected.transfer(playingArea, true);
                     cardsPlayed.add(selected);
                     isFirstTurn = false;
+                    nextPlayer = (nextPlayer + 1) % nbPlayers;
+                    lastPlayedCard=selected;
+
                     continue;
+
                 }
-            }
-
-            if (isAuto) {
-                if (0 == nextPlayer) {
-                    hands[0].setTouchEnabled(true);
-                    isWaitingForPass = true;
-                    passSelected = false;
-                    setStatus("Player 0 double-click on card to follow or press Enter to pass");
-                    while (null == selected && !passSelected) delay(delayTime);
-                    isWaitingForPass = false;
-                } else {
-                    setStatus("Player " + nextPlayer + " thinking...");
-                    delay(thinkingTime);
-                    do {
-                        selected = players[nextPlayer].getRandomCardOrSkip(hands[nextPlayer].getCardList());
-                    } while (selected != null && !isValidCardToPlay(selected)); // Ensure the selected card is valid
-
-                    if (selected == null) {
-                        setStatus("Player " + nextPlayer + " skipping...");
-                        delay(thinkingTime);
-                    }
-                }
-            }
-
-            if (!isAuto || finishedAuto) {
                 if (0 == nextPlayer) {
                     hands[0].setTouchEnabled(true);
                     isWaitingForPass = true;
@@ -259,6 +316,7 @@ public class CountingUpGame extends CardGame {
             }
 
             if (skipCount == nbPlayers - 1) {
+                lastPlayedCard=null;
                 playingArea.setView(this, new RowLayout(hideLocation, 0));
                 playingArea.draw();
                 winner = (nextPlayer + 1) % nbPlayers;
@@ -266,6 +324,7 @@ public class CountingUpGame extends CardGame {
                 score.calculateScoreEndOfRound(winner, cardsPlayed);
                 score.updateScore(winner);
                 logger.addEndOfRoundToLog();
+                System.out.println(Arrays.toString(score.scores));
                 roundNumber++;
                 logger.addRoundInfoToLog(roundNumber);
                 cardsPlayed = new ArrayList<>();
@@ -277,6 +336,7 @@ public class CountingUpGame extends CardGame {
             if (!isContinue) {
                 winner = nextPlayer;
                 score.calculateScoreEndOfRound(winner, cardsPlayed);
+                System.out.println(Arrays.toString(score.scores));
                 logger.addEndOfRoundToLog();
             } else {
                 nextPlayer = (nextPlayer + 1) % nbPlayers;
@@ -287,6 +347,7 @@ public class CountingUpGame extends CardGame {
         for (int i = 0; i < nbPlayers; i++) {
             score.calculateNegativeScoreEndOfGame(i, hands[i].getCardList());
             score.updateScore(i);
+
         }
     }
 }

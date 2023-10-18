@@ -28,4 +28,5 @@ public enum Rank {
     public String getRankCardLog() {
         return String.format("%d", rankCardValue);
     }
+
 }
