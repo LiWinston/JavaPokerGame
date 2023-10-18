@@ -12,7 +12,7 @@ public class PlayerController implements GGKeyListener {
 //    public boolean isWaitingForPass = true;
     public boolean passSelected = false;
     private final Properties properties;
-    private final List<List<String>> playerAutoMovements = new ArrayList<>();
+    public final List<List<String>> playerAutoMovements = new ArrayList<>();
 
     public PlayerController(CountingUpGame game, Properties properties) {
         this.properties = properties;

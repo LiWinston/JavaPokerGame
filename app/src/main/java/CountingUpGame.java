@@ -5,6 +5,7 @@ import ch.aplu.jgamegrid.Actor;
 import ch.aplu.jgamegrid.Location;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -41,13 +42,9 @@ public class CountingUpGame extends CardGame {
     private final Location[] handLocations = {new Location(350, 625), new Location(75, 350), new Location(350, 75), new Location(625, 350)};
     private final Location trickLocation = new Location(350, 350);
     private final Location textLocation = new Location(350, 450);
-    public Logger logger = new Logger();
-    public Score score = new Score(this);
     public boolean isWaitingForPass = false;
     public boolean passSelected = false;
     // new in -----------------------------------------------------------------------------------------------------------------------
-    public CardDealer dealer = new CardDealer(properties);
-    public PlayerController controller = new PlayerController(this, properties);
     private final StringBuilder logResult = new StringBuilder();
     private int thinkingTime = 2000;
     private int delayTime = 600;
@@ -81,6 +78,7 @@ public class CountingUpGame extends CardGame {
     public String runApp() {
         setTitle("CountingUpGame (V" + version + ") Constructed for UofM SWEN30006 with JGameGrid (www.aplu.ch)");
         setStatusText("Initializing...");
+        initPlayers();
         score.initScores();
         score.initScore();
         addKeyListener(controller);
@@ -126,11 +124,6 @@ public class CountingUpGame extends CardGame {
     public void setStatus(String string) {
         setStatusText(string);
     }
-
-
-
-
-    private int[] autoIndexHands = new int [nbPlayers];
 
 
 
