@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class PlayerController implements GGKeyListener{
 
-    private CountingUpGame game;
+//    private CountingUpGame game;
 //    public boolean isWaitingForPass = true;
     public boolean passSelected = false;
     private static final Random random = new Random();
@@ -18,7 +18,6 @@ public class PlayerController implements GGKeyListener{
     private List<List<String>> playerAutoMovements = new ArrayList<>();
 
     public PlayerController(CountingUpGame game, Properties properties) {
-        this.game = game;
         this.properties= properties;
         game.addKeyListener(this);
     }
@@ -28,9 +27,9 @@ public class PlayerController implements GGKeyListener{
 
     public boolean keyPressed(KeyEvent keyEvent) {
         System.out.println("yes i press!");
-        System.out.println(game.isWaitingForPass);
+        System.out.println(CountingUpGame.Instance().isWaitingForPass);
         if (CountingUpGame.Instance().isWaitingForPass && keyEvent.getKeyChar() == '\n') {
-            game.passSelected = true;
+            CountingUpGame.Instance().passSelected = true;
             System.out.println("yes i press!");
         }
         return false;
@@ -86,7 +85,7 @@ public class PlayerController implements GGKeyListener{
             int x = random.nextInt(tempList.size());
             Card selectedCard = tempList.get(x);
 
-            if (game.isValidCardToPlay(selectedCard)) {
+            if (CountingUpGame.Instance().isValidCardToPlay(selectedCard)) {
                 return selectedCard;
             } else {
                 tempList.remove(x);
