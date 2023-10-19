@@ -11,8 +11,9 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("serial")
-public class CountingUpGame extends CardGame {
+public class CountingUpGame extends CardGame implements IObserverable {
 
+    private List<IObserver> observers = new ArrayList<>();
     private static CountingUpGame instance; // 单例实例
     static public final int seed = 30008;
 
@@ -54,7 +55,18 @@ public class CountingUpGame extends CardGame {
     Player[] players;
     private final int[] autoIndexHands = new int[nbPlayers];
     private boolean isAuto = false;
+
+    public Card getSelectedCard() {
+        return selected;
+    }
+
     private Card selected;
+
+    public Player getNextPlayer() {
+        return players[nextPlayer];
+    }
+
+    private int nextPlayer;
 
     public Card getLastPlayedCard() {
         return lastPlayedCard;
@@ -227,7 +239,7 @@ public class CountingUpGame extends CardGame {
         playingArea = new Hand(deck);
         logger.addRoundInfoToLog(roundNumber);
 
-        int nextPlayer = playerIndexWithAceClub();
+        nextPlayer = playerIndexWithAceClub();
         while (isContinue) {
             selected = null;
             boolean finishedAuto = false;
@@ -267,11 +279,13 @@ public class CountingUpGame extends CardGame {
                 if (nextPlayer == playerIndexWithAceClub() && isFirstTurn) {
                     selected = dealer.getCardFromList(hands[nextPlayer].getCardList(), "1C");
                     selected.transfer(playingArea, true);
+
+                    notifyObservers();
+
                     cardsPlayed.add(selected);
                     isFirstTurn = false;
                     nextPlayer = (nextPlayer + 1) % nbPlayers;
                     lastPlayedCard=selected;
-
                     continue;
 
                 }
@@ -298,7 +312,10 @@ public class CountingUpGame extends CardGame {
 
             playingArea.setView(this, new RowLayout(trickLocation, (playingArea.getNumberOfCards() + 2) * trickWidth));
             playingArea.draw();
+
             logger.addCardPlayedToLog(nextPlayer, selected);
+            notifyObservers();
+
             if (selected != null) {
                 lastPlayedCard = selected;
                 skipCount = 0;
@@ -347,6 +364,23 @@ public class CountingUpGame extends CardGame {
             score.calculateNegativeScoreEndOfGame(i, hands[i].getCardList());
             score.updateScore(i);
 
+        }
+    }
+
+    @Override
+    public void addObserver(IObserver o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void removeObserver(IObserver o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (IObserver o : observers) {
+            o.response(this);
         }
     }
 }
