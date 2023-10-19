@@ -2,6 +2,7 @@ import ch.aplu.jcardgame.Card;
 import ch.aplu.jcardgame.Hand;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class BasicPlayerStrategy implements IPlayerStrategy {
@@ -9,21 +10,37 @@ public class BasicPlayerStrategy implements IPlayerStrategy {
     @Override
     public Card PickCardToPlay(Player p) {
         Card sameSuitGreaterRank = null;
-        Card difSuitEqualRank = null;
-        Card basicCard = null;
+        List<Card> difSuitEqualRank = new ArrayList<>();
+        Card selectedCard = null;
+        Card lastPlayerCard = CountingUpGame.Instance().getLastPlayedCard();
+
         ArrayList<Card> tempList = new ArrayList<>(p.hand.getCardList());
 
         for (Card card : tempList) {
-            if(card.getSuit() == CountingUpGame.Instance().getLastPlayedCard().getSuit()){
-                
+            if(card.getSuit() == lastPlayerCard.getSuit()){
+                if(Rank.isRankGreater(card, lastPlayerCard) && (sameSuitGreaterRank == null || Rank.isRankGreater(sameSuitGreaterRank, card))){
+                    sameSuitGreaterRank = card;
+                }
+            } else{
+                if(card.getRank() == lastPlayerCard.getRank()){
+                    difSuitEqualRank.add(card);
+                }
             }
-//            if(){
-//                basicCard = sameSuitGreaterRank;
-//            }else{
-//                basicCard = difSuitEqualRank;
-//            }
         }
 
-        return basicCard;
+        if(!difSuitEqualRank.isEmpty()){
+            //randomly pick a card from the list
+            Random random = new Random();
+            int x = random.nextInt(difSuitEqualRank.size());
+            selectedCard = difSuitEqualRank.get(x);
+
+        }else if(sameSuitGreaterRank != null){
+            selectedCard = sameSuitGreaterRank;
+//            return selectedCard;
+        }else {
+            return null;
+        }
+
+        return selectedCard;
     }
 }

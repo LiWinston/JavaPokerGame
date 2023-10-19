@@ -14,8 +14,12 @@ public enum Rank {
         this.scoreCardValue = scoreCardValue;
     }
 
+//    public static boolean isRankGreater(Card card1, Card card2) {
+//        return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
+//    }
+
     public static boolean isRankGreater(Card card1, Card card2) {
-        return card1.getRankId() < card2.getRankId(); // Warning: Reverse rank order of cards (see comment on enum)
+        return ((Rank)card1.getRank()).getRankCardValue() > ((Rank)card2.getRank()).getRankCardValue(); // Warning: Reverse rank order of cards (see comment on enum)
     }
     public int getRankCardValue() {
         return rankCardValue;
