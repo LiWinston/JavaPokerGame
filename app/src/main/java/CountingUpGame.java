@@ -55,6 +55,11 @@ public class CountingUpGame extends CardGame {
     private final int[] autoIndexHands = new int[nbPlayers];
     private boolean isAuto = false;
     private Card selected;
+
+    public Card getLastPlayedCard() {
+        return lastPlayedCard;
+    }
+
     private Card lastPlayedCard = null;
     public CountingUpGame(Properties properties) {
         super(700, 700, 30);
