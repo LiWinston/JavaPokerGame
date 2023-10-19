@@ -37,7 +37,7 @@ public class BasicPlayerStrategy implements IPlayerStrategy {
         }else if(sameSuitGreaterRank != null){
             selectedCard = sameSuitGreaterRank;
 //            return selectedCard;
-        }else {
+        }else if(ValidationFacade.getInstance().isValidCardToPlay(selectedCard)){
             return null;
         }
 

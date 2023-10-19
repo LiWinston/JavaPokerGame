@@ -14,7 +14,7 @@ public class RandomPlayerStrategy implements IPlayerStrategy {
             int x = random.nextInt(tempList.size());
             Card selectedCard = tempList.get(x);
 
-            if (CountingUpGame.Instance().isValidCardToPlay(selectedCard)) {
+            if (ValidationFacade.getInstance().isValidCardToPlay(selectedCard)) {
                 return selectedCard;
             } else {
                 tempList.remove(x);
