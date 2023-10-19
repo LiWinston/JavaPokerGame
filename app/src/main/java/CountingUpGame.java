@@ -69,6 +69,7 @@ public class CountingUpGame extends CardGame implements IObserverable {
     private int nextPlayer;
 
     public Card getLastPlayedCard() {
+        
         return lastPlayedCard;
     }
 
@@ -213,6 +214,7 @@ public class CountingUpGame extends CardGame implements IObserverable {
 
 
     public boolean isValidCardToPlay(Card card) {
+        if(card == null) return true;
         if (lastPlayedCard == null) return true;
 
         if (card.getSuit() == lastPlayedCard.getSuit()) {

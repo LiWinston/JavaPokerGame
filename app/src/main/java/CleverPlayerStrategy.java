@@ -20,6 +20,9 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver{
         ArrayList<Card> mergedList = new ArrayList<>();
         for(List<Card> l : cardsMemory.values()) mergedList.addAll(l);
         for (Card card : hand) {
+            if (!ValidationFacade.getInstance().isValidCardToPlay(card)) {
+                continue;
+            }
             List<Card> simulatedHand = new ArrayList<>(hand);
             simulatedHand.remove(card);
             List<Card> simulatedPlayedCards = new ArrayList<>(mergedList);  // assuming getLastPlayedCards() gives us a history
@@ -108,7 +111,9 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver{
                 }
             }
         }
-
+        if (card == null) {
+            return 0; // 如果选择不出牌
+        }
         return score;
     }
     @Override
