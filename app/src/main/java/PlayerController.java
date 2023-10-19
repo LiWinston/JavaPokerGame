@@ -8,11 +8,11 @@ import java.util.Properties;
 
 public class PlayerController implements GGKeyListener {
 
+    public final List<List<String>> playerAutoMovements = new ArrayList<>();
+    private final Properties properties;
     //    private CountingUpGame game;
 //    public boolean isWaitingForPass = true;
     public boolean passSelected = false;
-    private final Properties properties;
-    public final List<List<String>> playerAutoMovements = new ArrayList<>();
 
     public PlayerController(CountingUpGame game, Properties properties) {
         this.properties = properties;

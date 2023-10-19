@@ -1,16 +1,18 @@
 import ch.aplu.jcardgame.Card;
-import java.util.Iterator;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
-public class CleverPlayerStrategy implements IPlayerStrategy, IObserver{
+public class CleverPlayerStrategy implements IPlayerStrategy, IObserver {
     private static final int DEPTH_LIMIT = 3;
     HashMap<Player, ArrayList<Card>> cardsMemory = new HashMap<>();
-    CleverPlayerStrategy(){
+
+    CleverPlayerStrategy() {
         CountingUpGame.Instance().addObserver(this);
     }
+
     @Override
     public Card PickCardToPlay(Player p) {
         List<Card> hand = new ArrayList<>(p.hand.getCardList());
@@ -18,7 +20,7 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver{
         Card bestCard = null;
 
         ArrayList<Card> mergedList = new ArrayList<>();
-        for(List<Card> l : cardsMemory.values()) mergedList.addAll(l);
+        for (List<Card> l : cardsMemory.values()) mergedList.addAll(l);
         Iterator<Card> iterator = mergedList.iterator();
         while (iterator.hasNext()) {
             Card card = iterator.next();
@@ -43,6 +45,7 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver{
         }
         return bestCard;
     }
+
     private double minimax(int depth, boolean isMaximizingPlayer, List<Card> hand, List<Card> playedCards) {
         if (depth == 0) {
             return evaluateHandScore(hand);
@@ -72,6 +75,7 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver{
             return minEval;
         }
     }
+
     private double evaluateHandScore(List<Card> hand) {
         double score = 0;
         for (Card card : hand) {
@@ -79,6 +83,7 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver{
         }
         return score;
     }
+
     private double evaluateCardScore(Card card, List<Card> hand) {
 //        double score = 0.0;
 //
@@ -103,10 +108,10 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver{
 //        return score;
         double score = 0;
 
-        if (((Rank)card.getRank()).getRankCardValue() >= 10 || ((Rank)card.getRank()).getRankCardValue() == 1) {
+        if (((Rank) card.getRank()).getRankCardValue() >= 10 || ((Rank) card.getRank()).getRankCardValue() == 1) {
             score += 10;
         } else {
-            score += ((Rank)card.getRank()).getRankCardValue();
+            score += ((Rank) card.getRank()).getRankCardValue();
         }
 
 //        for (Player player : cardsMemory.keySet()) {
@@ -118,7 +123,7 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver{
 //            }
 //        }
         ArrayList<Card> mergedList = new ArrayList<>();
-        for(List<Card> l : cardsMemory.values()) mergedList.addAll(l);
+        for (List<Card> l : cardsMemory.values()) mergedList.addAll(l);
 
         Iterator<Card> iterator = mergedList.iterator();
         while (iterator.hasNext()) {
@@ -128,18 +133,19 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver{
             }
         }
 
-        for(Card cd : mergedList){
+        for (Card cd : mergedList) {
             if (cd.getSuit() == card.getSuit()) {
                 score += 0.5;
             }
         }
         return score;
     }
+
     @Override
     public void response(IObserverable subject) {
-        if(cardsMemory.containsKey(CountingUpGame.Instance().getNextPlayer())){
+        if (cardsMemory.containsKey(CountingUpGame.Instance().getNextPlayer())) {
             cardsMemory.get(CountingUpGame.Instance().getNextPlayer()).add(CountingUpGame.Instance().getSelectedCard());
-        }else{
+        } else {
             cardsMemory.put(CountingUpGame.Instance().getNextPlayer(), new ArrayList<Card>());
             cardsMemory.get(CountingUpGame.Instance().getNextPlayer()).add(CountingUpGame.Instance().getSelectedCard());
         }

@@ -1,5 +1,4 @@
 import ch.aplu.jcardgame.Card;
-import ch.aplu.jcardgame.Hand;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,27 +16,27 @@ public class BasicPlayerStrategy implements IPlayerStrategy {
         ArrayList<Card> tempList = new ArrayList<>(p.hand.getCardList());
 
         for (Card card : tempList) {
-            if(card.getSuit() == lastPlayerCard.getSuit()){
-                if(Rank.isRankGreater(card, lastPlayerCard) && (sameSuitGreaterRank == null || Rank.isRankGreater(sameSuitGreaterRank, card))){
+            if (card.getSuit() == lastPlayerCard.getSuit()) {
+                if (Rank.isRankGreater(card, lastPlayerCard) && (sameSuitGreaterRank == null || Rank.isRankGreater(sameSuitGreaterRank, card))) {
                     sameSuitGreaterRank = card;
                 }
-            } else{
-                if(card.getRank() == lastPlayerCard.getRank()){
+            } else {
+                if (card.getRank() == lastPlayerCard.getRank()) {
                     difSuitEqualRank.add(card);
                 }
             }
         }
 
-        if(!difSuitEqualRank.isEmpty()){
+        if (!difSuitEqualRank.isEmpty()) {
             //randomly pick a card from the list
             Random random = new Random();
             int x = random.nextInt(difSuitEqualRank.size());
             selectedCard = difSuitEqualRank.get(x);
 
-        }else if(sameSuitGreaterRank != null){
+        } else if (sameSuitGreaterRank != null) {
             selectedCard = sameSuitGreaterRank;
 //            return selectedCard;
-        }else if(ValidationFacade.getInstance().isValidCardToPlay(selectedCard)){
+        } else if (ValidationFacade.getInstance().isValidCardToPlay(selectedCard)) {
             return null;
         }
 

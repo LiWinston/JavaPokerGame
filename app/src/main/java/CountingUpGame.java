@@ -13,76 +13,48 @@ import java.util.stream.Collectors;
 @SuppressWarnings("serial")
 public class CountingUpGame extends CardGame implements IObserverable {
 
-    private final List<IObserver> observers = new ArrayList<>();
-    private static CountingUpGame instance; // 单例实例
     static public final int seed = 30008;
-
-    private Properties properties;
-//    private StringBuilder logResult = new StringBuilder();
-//    private List<List<String>> playerAutoMovements = new ArrayList<>();
-
-
-// new in -----------------------------------------------------------------------------------------------------------------------
-    public CardDealer dealer = new CardDealer(properties);
-
-
-    public Score score = new  Score(this);
-    public Logger logger = new Logger(score);
-    public PlayerController controller = new PlayerController(this,properties);
-//new in-----------------------------------------------------------------------------------------------------------------------
+    private static CountingUpGame instance; // 单例实例
+    //new in-----------------------------------------------------------------------------------------------------------------------
     public final int nbPlayers = 4;
     public final int nbStartCards = 13;
-    public final int nbRounds = 3;
+//    private StringBuilder logResult = new StringBuilder();
 //    private List<List<String>> playerAutoMovements = new ArrayList<>();
+    public final int nbRounds = 3;
+    public final Deck deck;
+    //    private List<List<String>> playerAutoMovements = new ArrayList<>();
     final String[] trumpImage = {"bigspade.gif", "bigheart.gif", "bigdiamond.gif", "bigclub.gif"};
+    private final List<IObserver> observers = new ArrayList<>();
     //new in-----------------------------------------------------------------------------------------------------------------------
     private final String version = "1.0";
     private final int handWidth = 400;
     private final int trickWidth = 40;
-    public final Deck deck;
     private final Location[] handLocations = {new Location(350, 625), new Location(75, 350), new Location(350, 75), new Location(625, 350)};
     private final Location trickLocation = new Location(350, 350);
     private final Location textLocation = new Location(350, 450);
-    public boolean isWaitingForPass = false;
-    public boolean passSelected = false;
     // new in -----------------------------------------------------------------------------------------------------------------------
     private final StringBuilder logResult = new StringBuilder();
-    private int thinkingTime = 2000;
-    private int delayTime = 600;
-    Hand[] hands;
     private final Location hideLocation = new Location(-500, -500);
     private final int[] scores = new int[nbPlayers];
-    Player[] players;
     private final int[] autoIndexHands = new int[nbPlayers];
-    private boolean isAuto = false;
-
-    public Card getSelectedCard() {
-        return selected;
-    }
-
-    private Card selected;
-
-    public Player getNextPlayer() {
-        return players[nextPlayer];
-    }
-
-    private int nextPlayer;
-
-    public Card getLastPlayedCard() {
-//        if(lastPlayedCard != null){
-//            return lastPlayedCard;
-//        }else {
-//            return getLastPlayedCard(lastPlayedCards);
-//        }
-        int sz = lastPlayedCards.size();
-        while(lastPlayedCards.get(sz - 1) == null){
-            sz --;
-        }
-        return lastPlayedCards.get(sz - 1);
-    }
     private final List<Card> lastPlayedCards = new ArrayList<>();
-
+    public Score score = new Score(this);
+    public Logger logger = new Logger(score);
+    public boolean isWaitingForPass = false;
+    public boolean passSelected = false;
+    Hand[] hands;
+    Player[] players;
+    private Properties properties;
+    // new in -----------------------------------------------------------------------------------------------------------------------
+    public CardDealer dealer = new CardDealer(properties);
+    public PlayerController controller = new PlayerController(this, properties);
+    private int thinkingTime = 2000;
+    private int delayTime = 600;
+    private boolean isAuto = false;
+    private Card selected;
+    private int nextPlayer;
     private Card lastPlayedCard = null;
+
     public CountingUpGame(Properties properties) {
         super(700, 700, 30);
         this.properties = properties;
@@ -100,6 +72,27 @@ public class CountingUpGame extends CardGame implements IObserverable {
 
     public static CountingUpGame Instance() {
         return instance;
+    }
+
+    public Card getSelectedCard() {
+        return selected;
+    }
+
+    public Player getNextPlayer() {
+        return players[nextPlayer];
+    }
+
+    public Card getLastPlayedCard() {
+//        if(lastPlayedCard != null){
+//            return lastPlayedCard;
+//        }else {
+//            return getLastPlayedCard(lastPlayedCards);
+//        }
+        int sz = lastPlayedCards.size();
+        while (lastPlayedCards.get(sz - 1) == null) {
+            sz--;
+        }
+        return lastPlayedCards.get(sz - 1);
     }
 
     public String runApp() {
@@ -151,12 +144,6 @@ public class CountingUpGame extends CardGame implements IObserverable {
     public void setStatus(String string) {
         setStatusText(string);
     }
-
-
-
-
-
-
 
 
     private void initGame() {
@@ -221,9 +208,8 @@ public class CountingUpGame extends CardGame implements IObserverable {
     }
 
 
-
     public boolean isValidCardToPlay(Card card) {
-        if(card == null) return true;
+        if (card == null) return true;
         if (lastPlayedCard == null) return true;
 
         if (card.getSuit() == lastPlayedCard.getSuit()) {
@@ -252,7 +238,6 @@ public class CountingUpGame extends CardGame implements IObserverable {
             boolean finishedAuto = false;
 
 
-
             if (isAuto) {
                 int nextPlayerAutoIndex = autoIndexHands[nextPlayer];
                 List<String> nextPlayerMovement = controller.playerAutoMovements.get(nextPlayer);
@@ -274,7 +259,7 @@ public class CountingUpGame extends CardGame implements IObserverable {
                         delay(thinkingTime);
                         selected = dealer.getCardFromList(nextHand.getCardList(), nextMovement);
                         while (selected != null && !isValidCardToPlay(selected)) {
-                            selected=null;
+                            selected = null;
                         }
                     }
                 } else {
@@ -282,7 +267,7 @@ public class CountingUpGame extends CardGame implements IObserverable {
                 }
             }
 
-            if (!isAuto || finishedAuto){
+            if (!isAuto || finishedAuto) {
                 if (nextPlayer == playerIndexWithAceClub() && isFirstTurn) {
                     selected = dealer.getCardFromList(hands[nextPlayer].getCardList(), "1C");
                     selected.transfer(playingArea, true);
@@ -292,7 +277,7 @@ public class CountingUpGame extends CardGame implements IObserverable {
                     cardsPlayed.add(selected);
                     isFirstTurn = false;
                     nextPlayer = (nextPlayer + 1) % nbPlayers;
-                    lastPlayedCard=selected;
+                    lastPlayedCard = selected;
                     lastPlayedCards.add(lastPlayedCard);
 
                     continue;
@@ -342,7 +327,7 @@ public class CountingUpGame extends CardGame implements IObserverable {
             }
 
             if (skipCount == nbPlayers - 1) {
-                lastPlayedCard=null;
+                lastPlayedCard = null;
                 lastPlayedCards.add(lastPlayedCard);
 
                 playingArea.setView(this, new RowLayout(hideLocation, 0));

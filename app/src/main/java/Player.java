@@ -3,9 +3,7 @@
 import ch.aplu.jcardgame.Card;
 import ch.aplu.jcardgame.Hand;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Player {
     private final PlayerType playerType;
@@ -13,7 +11,7 @@ public class Player {
     protected int score;
     protected List<Card> playedCards;
 
-        IPlayerStrategy playerStrategy;
+    IPlayerStrategy playerStrategy;
 
     public Player(String playerTypeStr) {
         this.playerType = PlayerType.valueOf(playerTypeStr.toUpperCase());
@@ -41,7 +39,7 @@ public class Player {
     public Card PickCardToPlay() {
         return playerStrategy.PickCardToPlay(this);
     }
-    
+
 
     public enum PlayerType {
         HUMAN, RANDOM, BASIC, CLEVER
