@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("serial")
 public class CountingUpGame extends CardGame implements IObserverable {
 
-    private List<IObserver> observers = new ArrayList<>();
+    private final List<IObserver> observers = new ArrayList<>();
     private static CountingUpGame instance; // 单例实例
     static public final int seed = 30008;
 
@@ -80,7 +80,7 @@ public class CountingUpGame extends CardGame implements IObserverable {
         }
         return lastPlayedCards.get(sz - 1);
     }
-    private List<Card> lastPlayedCards = new ArrayList<>();
+    private final List<Card> lastPlayedCards = new ArrayList<>();
 
     private Card lastPlayedCard = null;
     public CountingUpGame(Properties properties) {
@@ -229,11 +229,7 @@ public class CountingUpGame extends CardGame implements IObserverable {
         if (card.getSuit() == lastPlayedCard.getSuit()) {
             return isRankGreater(card, lastPlayedCard);
 
-        } else if (card.getRank() == lastPlayedCard.getRank()) {
-            return true;
-        }
-
-        return false;
+        } else return card.getRank() == lastPlayedCard.getRank();
     }
 
     private void playGame() {

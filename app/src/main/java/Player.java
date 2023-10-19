@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Player {
-    private PlayerType playerType;
+    private final PlayerType playerType;
     protected Hand hand;
     protected int score;
     protected List<Card> playedCards;

@@ -87,17 +87,16 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver{
 //        if (cardValue <= 10) {
 //            score -= cardValue;
 //        } else {
-//            score -= 10;  // J, Q, K, A 都计为10分
+//            score -= 10;
 //        }
 //
-//        // 根据其他玩家的行为调整分数
 //        Suit cardSuit = (Suit) card.getSuit();
 //        int countSameSuitPlayed = (int) playedCards.stream().filter(c -> c.getSuit() == cardSuit).count();
-//        score += countSameSuitPlayed * 0.5;  // 被多次打出的花色可能更有价值
+//        score += countSameSuitPlayed * 0.5;
 //
-//        // 考虑赢得本轮的可能性
+//
 //        int highValueCards = (int) hand.stream().filter(c -> c.getValue() > 8 || c.getValue() == 1).count();  // 1 for Ace, and values > 8 for 10, J, Q, K
-//        if (highValueCards > 3) {  // 如果手中有多张高点数的牌，增加牌的分数，因为玩家可能会尝试赢得本轮
+//        if (highValueCards > 3) {
 //            score += 2.0;
 //        }
 //

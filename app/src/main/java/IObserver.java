@@ -1,3 +1,3 @@
 public interface IObserver {
-    public void response(IObserverable subject);
+    void response(IObserverable subject);
 }

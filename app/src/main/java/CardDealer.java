@@ -13,7 +13,7 @@ public class CardDealer {
 
     private static final Random random = new Random();
 //    private final Deck deck = new Deck(Suit.values(), Rank.values(), "cover");
-    private Properties properties;
+    private final Properties properties;
 
     public CardDealer(Properties properties){
         this.properties= properties;

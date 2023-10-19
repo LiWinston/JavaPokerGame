@@ -21,7 +21,7 @@ public class Score {
     public Actor[] scoreActors = {null, null, null, null};
     public int[] scores = new int[nbPlayers];
 
-    private CountingUpGame game;
+    private final CountingUpGame game;
 
     Font bigFont = new Font("Arial", Font.BOLD, 36);
 
@@ -69,7 +69,7 @@ public class Score {
     public void initScore() {
         for (int i = 0; i < nbPlayers; i++) {
             // scores[i] = 0;
-            String text = "[" + String.valueOf(scores[i]) + "]";
+            String text = "[" + scores[i] + "]";
             scoreActors[i] = new TextActor(text, Color.WHITE, game.bgColor, bigFont);
             game.addActor(scoreActors[i], scoreLocations[i]);
         }
@@ -80,7 +80,7 @@ public class Score {
     public void updateScore(int player) {
         game.removeActor(scoreActors[player]);
         int displayScore = scores[player] >= 0 ? scores[player] : 0;
-        String text = "P" + player + "[" + String.valueOf(displayScore) + "]";
+        String text = "P" + player + "[" + displayScore + "]";
         scoreActors[player] = new TextActor(text, Color.WHITE, game.bgColor, bigFont);
         game.addActor(scoreActors[player], scoreLocations[player]);
 //        System.out.println("Scores updated: " + Arrays.toString(scores));
