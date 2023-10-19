@@ -1,5 +1,5 @@
 import ch.aplu.jcardgame.Card;
-
+import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,6 +19,13 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver{
 
         ArrayList<Card> mergedList = new ArrayList<>();
         for(List<Card> l : cardsMemory.values()) mergedList.addAll(l);
+        Iterator<Card> iterator = mergedList.iterator();
+        while (iterator.hasNext()) {
+            Card card = iterator.next();
+            if (card == null) {
+                iterator.remove();  // 使用迭代器的 remove 方法删除元素
+            }
+        }
         for (Card card : hand) {
             if (!ValidationFacade.getInstance().isValidCardToPlay(card)) {
                 continue;
@@ -103,16 +110,29 @@ public class CleverPlayerStrategy implements IPlayerStrategy, IObserver{
             score += ((Rank)card.getRank()).getRankCardValue();
         }
 
-        for (Player player : cardsMemory.keySet()) {
-            ArrayList<Card> playedByPlayer = cardsMemory.get(player);
-            for (Card playedCard : playedByPlayer) {
-                if (playedCard.getSuit() == card.getSuit()) {
-                    score += 0.5;
-                }
+//        for (Player player : cardsMemory.keySet()) {
+//            ArrayList<Card> playedByPlayer = cardsMemory.get(player);
+//            for (Card playedCard : playedByPlayer) {
+//                if (playedCard.getSuit() == card.getSuit()) {
+//                    score += 0.5;
+//                }
+//            }
+//        }
+        ArrayList<Card> mergedList = new ArrayList<>();
+        for(List<Card> l : cardsMemory.values()) mergedList.addAll(l);
+
+        Iterator<Card> iterator = mergedList.iterator();
+        while (iterator.hasNext()) {
+            Card cardx = iterator.next();
+            if (cardx == null) {
+                iterator.remove();  // 使用迭代器的 remove 方法删除元素
             }
         }
-        if (card == null) {
-            return 0; // 如果选择不出牌
+
+        for(Card cd : mergedList){
+            if (cd.getSuit() == card.getSuit()) {
+                score += 0.5;
+            }
         }
         return score;
     }
