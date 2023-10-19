@@ -113,7 +113,7 @@ public class CountingUpGame extends CardGame {
         for (int i = 0; i < 4; i++) {
             String playerKey = "players." + i;
             String playerTypeStr = properties.getProperty(playerKey);
-            players[i] = new Player(playerTypeStr, i);
+            players[i] = new Player(playerTypeStr);
         }
         hands = new Hand[nbPlayers];
         for (int i = 0; i < nbPlayers; i++) {
@@ -280,7 +280,8 @@ public class CountingUpGame extends CardGame {
                 } else {
                     setStatus("Player " + nextPlayer + " thinking...");
                     delay(thinkingTime);
-                    selected = players[nextPlayer].getRandomCardOrSkip(hands[nextPlayer].getCardList());
+//                    selected = players[nextPlayer].PickCardToPlay(hands[nextPlayer].getCardList());
+                    selected = players[nextPlayer].PickCardToPlay();
                     if (selected == null) {
                         setStatus("Player " + nextPlayer + " skipping...");
                         delay(thinkingTime);
