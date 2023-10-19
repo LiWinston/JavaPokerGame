@@ -69,8 +69,18 @@ public class CountingUpGame extends CardGame implements IObserverable {
     private int nextPlayer;
 
     public Card getLastPlayedCard() {
-        return lastPlayedCard;
+//        if(lastPlayedCard != null){
+//            return lastPlayedCard;
+//        }else {
+//            return getLastPlayedCard(lastPlayedCards);
+//        }
+        int sz = lastPlayedCards.size();
+        while(lastPlayedCards.get(sz - 1) == null){
+            sz --;
+        }
+        return lastPlayedCards.get(sz - 1);
     }
+    private List<Card> lastPlayedCards = new ArrayList<>();
 
     private Card lastPlayedCard = null;
     public CountingUpGame(Properties properties) {
@@ -213,6 +223,7 @@ public class CountingUpGame extends CardGame implements IObserverable {
 
 
     public boolean isValidCardToPlay(Card card) {
+        if(card == null) return true;
         if (lastPlayedCard == null) return true;
 
         if (card.getSuit() == lastPlayedCard.getSuit()) {
@@ -286,6 +297,8 @@ public class CountingUpGame extends CardGame implements IObserverable {
                     isFirstTurn = false;
                     nextPlayer = (nextPlayer + 1) % nbPlayers;
                     lastPlayedCard=selected;
+                    lastPlayedCards.add(lastPlayedCard);
+
                     continue;
 
                 }
@@ -318,6 +331,7 @@ public class CountingUpGame extends CardGame implements IObserverable {
 
             if (selected != null) {
                 lastPlayedCard = selected;
+                lastPlayedCards.add(lastPlayedCard);
                 skipCount = 0;
                 cardsPlayed.add(selected);
                 selected.setVerso(false);  // In case it is upside down
@@ -333,6 +347,8 @@ public class CountingUpGame extends CardGame implements IObserverable {
 
             if (skipCount == nbPlayers - 1) {
                 lastPlayedCard=null;
+                lastPlayedCards.add(lastPlayedCard);
+
                 playingArea.setView(this, new RowLayout(hideLocation, 0));
                 playingArea.draw();
                 winner = (nextPlayer + 1) % nbPlayers;
