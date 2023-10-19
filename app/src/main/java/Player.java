@@ -41,24 +41,7 @@ public class Player {
     public Card PickCardToPlay() {
         return playerStrategy.PickCardToPlay(this);
     }
-//
-//    public Card getRandomCardOrSkip(ArrayList<Card> list) {
-//        ArrayList<Card> tempList = new ArrayList<>(list);
-//
-//        while (!tempList.isEmpty()) {
-//            Random random = new Random();
-//            int x = random.nextInt(tempList.size());
-//            Card selectedCard = tempList.get(x);
-//
-//            if (CountingUpGame.Instance().isValidCardToPlay(selectedCard)) {
-//                return selectedCard;
-//            } else {
-//                tempList.remove(x);
-//            }
-//        }
-//
-//        return null;
-//    }
+    
 
     public enum PlayerType {
         HUMAN, RANDOM, BASIC, CLEVER
