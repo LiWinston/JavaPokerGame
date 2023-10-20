@@ -18,7 +18,7 @@ public class CountingUpGame extends CardGame implements IObserverable {
     //new in-----------------------------------------------------------------------------------------------------------------------
     public final int nbPlayers = 4;
     public final int nbStartCards = 13;
-//    private StringBuilder logResult = new StringBuilder();
+    //    private StringBuilder logResult = new StringBuilder();
 //    private List<List<String>> playerAutoMovements = new ArrayList<>();
     public final int nbRounds = 3;
     public final Deck deck;
@@ -239,9 +239,11 @@ public class CountingUpGame extends CardGame implements IObserverable {
 
 
             if (isAuto) {
+//                System.out.println("now is auto");
                 int nextPlayerAutoIndex = autoIndexHands[nextPlayer];
                 List<String> nextPlayerMovement = controller.playerAutoMovements.get(nextPlayer);
                 String nextMovement = "";
+                isFirstTurn = false;
 
                 if (nextPlayerMovement.size() > nextPlayerAutoIndex) {
                     nextMovement = nextPlayerMovement.get(nextPlayerAutoIndex);
@@ -268,9 +270,15 @@ public class CountingUpGame extends CardGame implements IObserverable {
             }
 
             if (!isAuto || finishedAuto) {
+//                System.out.println("now is not auto");
                 if (nextPlayer == playerIndexWithAceClub() && isFirstTurn) {
                     selected = dealer.getCardFromList(hands[nextPlayer].getCardList(), "1C");
-                    selected.transfer(playingArea, true);
+                    if (selected != null) {
+                        selected.transfer(playingArea, true);
+
+                    } else {
+                        System.out.println("No card");
+                    }
 
                     notifyObservers();
 
